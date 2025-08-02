@@ -1,0 +1,61 @@
+{
+  "manifest_version": 3,
+  "name": "HippoCampus",
+  "version": "1.0",
+  "description": "I can remember anything for you",
+  "icons": {
+    "256": "HippoCampusLogo.png"
+  },
+  "permissions": [
+    "scripting", 
+    "activeTab",
+    "tabs",
+    "bookmarks",
+    "cookies",
+    "storage",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "http://localhost:5173/*",
+    "https://magical-famous-emu.ngrok-free.app/*",
+    "https://extension-auth.vercel.app/*",
+    "https://hippocampus-1.onrender.com//*",
+    "http://127.0.0.1:8000/*",
+    "<all_urls>"
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["index.html","error.html"],
+      "matches": ["<all_urls>"]
+    }
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://extension-auth.vercel.app/*"],
+      "js": ["auth-content-script.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "action": {
+    "default_title": "Toggle Sidebar"
+  },
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+M",
+        "mac": "Alt+M"
+      },
+      "description": "Toggle HippoCampus extension"
+    },
+    "quick_search": {
+      "suggested_key": {
+        "default": "Alt+X",
+        "mac": "Alt+X"
+      },
+      "description": "Quick search in HippoCampus"
+    }
+  }
+}
