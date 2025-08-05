@@ -8,16 +8,16 @@
  * @returns Text with collection pattern removed
  * 
  * Examples:
- * removeCollectionPattern("This is about #books: machine learning") -> "This is about machine learning"
- * removeCollectionPattern("#songs: my favorite music") -> "my favorite music"
+ * removeCollectionPattern("This is about @books machine learning") -> "This is about machine learning"
+ * removeCollectionPattern("@songs my favorite music") -> "my favorite music"
  */
 export function removeCollectionPattern(text: string | null | undefined): string {
   if (!text || typeof text !== 'string') {
     return text || '';
   }
 
-  // Pattern to match #collectionname: (same as backend)
-  const pattern = /\s*#[a-zA-Z0-9_-]+:\s*/g;
+  // Pattern to match @collectionname (same as backend)
+  const pattern = /\s*@[a-zA-Z0-9_-]+\s*/g;
   
   try {
     const cleanedText = text.replace(pattern, '').trim();
@@ -29,7 +29,7 @@ export function removeCollectionPattern(text: string | null | undefined): string
 }
 
 /**
- * Extract collection name from text using the pattern #collectionname:
+ * Extract collection name from text using the pattern @collectionname
  * @param text - The text to search for collection pattern
  * @returns The extracted collection name or null if no pattern found
  */
@@ -38,8 +38,8 @@ export function extractCollectionFromText(text: string | null | undefined): stri
     return null;
   }
 
-  // Pattern to match #collectionname: where collectionname can contain letters, numbers, underscores, hyphens
-  const pattern = /#([a-zA-Z0-9_-]+):/;
+  // Pattern to match @collectionname where collectionname can contain letters, numbers, underscores, hyphens
+  const pattern = /@([a-zA-Z0-9_-]+)/;
   
   try {
     const match = text.match(pattern);

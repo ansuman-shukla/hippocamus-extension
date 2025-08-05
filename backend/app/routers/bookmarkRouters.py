@@ -63,9 +63,40 @@ async def search_links(
         raise HTTPException(status_code=401, detail="Authentication required")
 
     try:
-        logger.info(f"Attempting to search document for user {user_id}")
-        result = await search_vector_db(query=search_request.query, namespace=user_id, filter=search_request.filter)
-        logger.info(f"Successfully searched document for user {user_id}")
+        logger.info(f"🔍 SEARCH: Starting search request for user {user_id}")
+        logger.info(f"📝 SEARCH: Original query received: '{search_request.query}'")
+        logger.info(f"🎯 SEARCH: Filter received: {search_request.filter}")
+        
+        # Extract @collection pattern if present
+        from app.utils.collection_extractor import extract_collection_from_text, remove_collection_pattern_from_text
+        
+        extracted_collection = extract_collection_from_text(search_request.query)
+        cleaned_query = remove_collection_pattern_from_text(search_request.query)
+        
+        logger.info(f"🔍 SEARCH: Extracted collection from query: '{extracted_collection}'")
+        logger.info(f"🧹 SEARCH: Cleaned query after removing @collection: '{cleaned_query}'")
+        
+        # Use cleaned query for search
+        final_query = cleaned_query if cleaned_query else search_request.query
+        final_filter = search_request.filter
+        
+        # If collection was extracted and no filter exists, create one
+        if extracted_collection and not final_filter:
+            final_filter = {"collection": {"$eq": extracted_collection}}
+            logger.info(f"🎯 SEARCH: Created filter from extracted collection: {final_filter}")
+        elif extracted_collection and final_filter:
+            logger.info(f"🎯 SEARCH: Collection extracted but filter already exists, using existing filter")
+        
+        logger.info(f"📤 SEARCH: Final search parameters:")
+        logger.info(f"   ├─ Query: '{final_query}'")
+        logger.info(f"   ├─ Filter: {final_filter}")
+        logger.info(f"   └─ Namespace: {user_id}")
+        
+        result = await search_vector_db(query=final_query, namespace=user_id, filter=final_filter)
+        
+        logger.info(f"📥 SEARCH: Search completed successfully for user {user_id}")
+        logger.info(f"📊 SEARCH: Results count: {len(result) if isinstance(result, list) else 'Unknown'}")
+        
         return result
     except InvalidRequestError as e:
         raise HTTPException(status_code=400, detail=str(e))

@@ -4,7 +4,7 @@ from typing import Optional, Any, Dict
 from functools import wraps
 from pymongo.errors import PyMongoError, ConnectionFailure, ServerSelectionTimeoutError
 from app.exceptions.global_exceptions import DatabaseConnectionError
-from app.core.database import client, db, collection, collection_memories, collection_notes
+from app.core.database import client, db, collection, collection_memories, collection_notes, collection_user_collections
 
 logger = logging.getLogger(__name__)
 
@@ -148,6 +148,7 @@ class SafeCollection:
 safe_collection = SafeCollection(collection, db_wrapper)
 safe_collection_memories = SafeCollection(collection_memories, db_wrapper)
 safe_collection_notes = SafeCollection(collection_notes, db_wrapper)
+safe_collection_user_collections = SafeCollection(collection_user_collections, db_wrapper)
 
 async def get_database_health() -> Dict[str, Any]:
     """Get database health status"""

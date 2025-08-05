@@ -87,6 +87,7 @@ export function useSimpleAuth() {
         // Check auth status with backend
         const authStatus = await checkAuthStatus();
         console.log('🔍 Auth status response:', authStatus);
+        console.log('🔍 Auth status - is_authenticated:', authStatus.is_authenticated, 'token_valid:', authStatus.token_valid);
         
         if (authStatus.is_authenticated && authStatus.token_valid) {
           console.log('✅ User is authenticated and token is valid');
@@ -104,14 +105,19 @@ export function useSimpleAuth() {
           await chrome.storage.local.remove(['access_token', 'refresh_token']);
           setUser(null);
         } else {
-          console.log('❌ Token invalid or user not authenticated:', authStatus);
+          console.log('❌ Token invalid or user not authenticated. Checking if we can refresh...');
+          console.log('🔄 Refresh token available:', !!tokens.refresh_token);
           // Try to refresh token if we have a refresh token
           if (tokens.refresh_token) {
-            console.log('🔄 Attempting to refresh token...');
+            console.log('🔄 Starting token refresh process...');
             try {
+              console.log('🔄 Calling refreshTokens function...');
               await refreshTokens(tokens.refresh_token);
+              console.log('✅ Token refresh completed successfully');
               // After refresh, try checking auth status again
+              console.log('🔄 Rechecking auth status after token refresh...');
               const newAuthStatus = await checkAuthStatus();
+              console.log('🔄 New auth status:', newAuthStatus.is_authenticated);
               if (newAuthStatus.is_authenticated) {
                 const profile = {
                   id: newAuthStatus.user_id,
@@ -130,11 +136,13 @@ export function useSimpleAuth() {
               setUser(null);
             }
           } else {
+            console.log('❌ No refresh token available, setting user to null');
             setUser(null);
           }
         }
       } catch (e: any) {
-        console.log('❌ Auth check failed:', e.message);
+        console.log('❌ Auth check failed (outer catch):', e.message);
+        console.log('❌ This means checkAuthStatus threw an error, not the backend response');
         setUser(null);
       } finally {
         setLoading(false);

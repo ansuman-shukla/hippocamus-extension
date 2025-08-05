@@ -10,6 +10,7 @@ from app.routers.get_quotes import router as get_quotes_router
 from app.routers.notesRouter import router as notes_router
 from app.routers.summaryRouter import router as summary_router
 from app.routers.auth_router import router as auth_router
+from app.routers.collections_router import router as collections_router
 from app.exceptions.global_exceptions import (
     global_exception_handler,
     AuthenticationError,
@@ -188,3 +189,4 @@ app.include_router(get_quotes_router)
 app.include_router(notes_router)
 app.include_router(summary_router)
 app.include_router(auth_router)
+app.include_router(collections_router)

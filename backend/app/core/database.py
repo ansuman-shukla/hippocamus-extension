@@ -14,6 +14,7 @@ db = client[settings.MONGODB_DB]
 collection = db[settings.MONGODB_COLLECTION_USER]
 collection_memories = db[settings.MONGODB_COLLECTION_MEMORIES]
 collection_notes = db[settings.MONGODB_COLLECTION_NOTES]
+collection_user_collections = db["user_collections"]
 
 
 

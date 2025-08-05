@@ -101,6 +101,7 @@ export async function checkAuthStatus() {
     });
 
     if (!response.ok) {
+        console.log('🔍 checkAuthStatus: Backend returned non-OK status:', response.status);
         throw new Error(`Auth status check failed: ${response.status}`);
     }
     

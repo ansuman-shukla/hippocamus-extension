@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import InputForm from "../components/InputForm";
 import { useState, useRef } from "react";
-import { BiSearchAlt2 } from "react-icons/bi";
 import '../index.css';
 import isUrlHttp from "is-url-http";
 import { submitLink, saveNotes } from "../utils/apiClient";
@@ -14,10 +13,9 @@ interface FormData {
 
 export default function ResponsePage() {
 
-  const [leftBtnTxt, setLftBtnTxt] = useState("SUMMARIZE");
+const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
   const [BtnTxtClr, setBtnTxtClr] = useState("--primary-yellow");
-  const [rightBtnTxt, setRtBtnTxt] = useState("MEMORIZE");
-  const [notSubmitted, setnotSubmitted] = useState(true);
+  const [rightBtnTxt, setRtBtnTxt] = useState("SAVE");
   const [bgClr, setbgClr] = useState("--primary-yellow");
   const [isError, setisError] = useState('');
   const [showOnlyOne, setShowOnlyOne] = useState(false);
@@ -72,7 +70,6 @@ export default function ResponsePage() {
 
 
     if (currentTab === "submit" && (formData.link === "" || isValidURL(formData.link) || formData.title === "")) {
-      setnotSubmitted(true);
       if(isValidURL(formData.link)){
         setisError("Enter a valid link!")
         return
@@ -81,14 +78,12 @@ export default function ResponsePage() {
       return
     }
     else if (currentTab === "notes" && (NotesTitle.trim() === "" || extraNote.trim() === "")) {
-      setnotSubmitted(true);
       setisError("Title and Note are required!")
       return
     }
     else {
       setIsLoading(true);
       setisError('')
-      setnotSubmitted(false);
 
       try {
         if (currentTab === "submit") {
@@ -151,9 +146,9 @@ export default function ResponsePage() {
       Navigate(0);
     }
     else{
-      // Set navigation flag and navigate to summarize
+      // Set navigation flag and navigate to search
       isNavigating.current = true;
-      Navigate("/summarize");
+      Navigate("/search");
       
       // Reset flag after a delay to allow for normal navigation
       setTimeout(() => {
@@ -172,30 +167,6 @@ export default function ResponsePage() {
         <div className="flex justify-between items-center mb-6 gap-2 ">
           <div className='flex flex-col justify-end  -gap-2'>
           </div>
-          {notSubmitted ?
-            <div
-              className="group relative flex items-center cursor-pointer box-border bg-transparent 
-             px-2 py-2 rounded-full "
-              onClick={() => Navigate("/search")}
-            >
-              <input
-                type="text"
-                placeholder="SEARCH"
-                className="bg-transparent focus:outline-none text-black placeholder:text-[11px] 
-              placeholder:text-black w-[70px] font-SansText400 pb-[2px] 
-              placeholder:tracking-widest cursor-pointer relative z-10"
-              />
-              <BiSearchAlt2 size={24} className="relative z-10" />
-
-              {/* Animated border element */}
-              <div className="absolute inset-0 before:absolute before:inset-0 before:border-[1.5px] 
-                before:border-black before:rounded-full before:scale-100 
-                before:transition-transform before:duration-300 before:ease-in-out 
-                group-hover:before:scale-105 group-hover:before:border-2">
-              </div>
-            </div>
-
-            : null}
         </div>
 
 

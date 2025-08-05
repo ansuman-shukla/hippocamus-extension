@@ -76,6 +76,25 @@ export const makeRequest = async <T = any>(
     // - User authentication state
     
     if (!response.ok) {
+      // Handle 404 responses for search endpoints gracefully
+      if (response.status === 404 && endpoint.includes('/search')) {
+        console.log(`🔍 API CLIENT: Search returned no results (404)`);
+        
+        let errorData: ApiError;
+        try {
+          errorData = await response.json();
+          console.log(`   └─ Message: ${errorData.detail}`);
+        } catch (jsonError) {
+          errorData = { detail: "No documents found matching query", status_code: 404 };
+        }
+        
+        const error = new Error(errorData.detail || 'No documents found matching query');
+        (error as any).status = response.status;
+        (error as any).errorType = 'no_results';
+        (error as any).statusCode = response.status;
+        throw error;
+      }
+      
       console.error(`❌ API CLIENT: Request failed with status ${response.status}`);
       
       // Handle 401 Unauthorized responses by automatically logging out the user
@@ -149,6 +168,12 @@ export const makeRequest = async <T = any>(
     console.log(`✅ API CLIENT: Request completed successfully`);
     return textData as T;
   } catch (error: any) {
+    // Handle search 404s gracefully without error logging
+    if (error.status === 404 && endpoint.includes('/search') && error.errorType === 'no_results') {
+      console.log(`🔍 API CLIENT: Search completed with no results for ${endpoint}`);
+      throw error;
+    }
+    
     console.error(`💥 API CLIENT: Request failed for ${endpoint}`);
     console.error(`   ├─ Error type: ${error.constructor.name}`);
     console.error(`   ├─ Error message: ${error.message}`);

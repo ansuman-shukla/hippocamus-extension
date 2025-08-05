@@ -8,6 +8,7 @@ from app.schema.link_schema import Link as LinkSchema
 from app.utils.site_name_extractor import extract_site_name
 from app.utils.collection_extractor import extract_collection_from_text, remove_collection_pattern_from_text
 from app.services.memories_service import save_memory_to_db
+from app.services.user_collections_service import add_collection_to_user
 from app.exceptions.httpExceptionsSearch import *
 from app.exceptions.httpExceptionsSave import *
 from app.exceptions.global_exceptions import ExternalServiceError
@@ -52,12 +53,17 @@ async def save_to_vector_db(obj: LinkSchema, namespace: str):
             "collection": collection, #catagory that memory belongs to 
         }
 
+        logger.info(f"📤 SAVE: Text being embedded: '{text_to_embed}'")
+        logger.info(f"📊 SAVE: Metadata being saved: {metadata}")
+        
         # Generate E5 embeddings using safe wrapper
         embedding = await safe_pc.embed(
             model="multilingual-e5-large",
             inputs=[text_to_embed],
             parameters={"input_type": "passage", "truncate": "END"}
         )
+        
+        logger.info(f"🦖 SAVE: Embedding generated successfully, dimensions: {len(embedding[0]['values'])}")
 
         # Prepare and upsert vector
         vector = {
@@ -65,15 +71,33 @@ async def save_to_vector_db(obj: LinkSchema, namespace: str):
             "values": embedding[0]['values'],
             "metadata": metadata
         }
+        
+        logger.info(f"📤 SAVE: Vector payload being sent to Pinecone:")
+        logger.info(f"   ├─ ID: {vector['id']}")
+        logger.info(f"   ├─ Values length: {len(vector['values'])}")
+        logger.info(f"   └─ Metadata: {vector['metadata']}")
 
         # Upsert using safe wrapper - store in default namespace
-        await safe_index.upsert(
+        upsert_result = await safe_index.upsert(
             vectors=[vector]
             # No namespace parameter = default namespace
         )
+        
+        logger.info(f"📥 SAVE: Pinecone upsert result: {upsert_result}")
 
         # Save to database
         await save_memory_to_db(metadata)
+        
+        # Track collection in user_collections table if collection was extracted
+        if collection and collection != "general":
+            try:
+                logger.info(f"📚 COLLECTIONS: Tracking collection '{collection}' for user {namespace}")
+                await add_collection_to_user(namespace, collection)
+                logger.info(f"📚 COLLECTIONS: Successfully tracked collection '{collection}' for user {namespace}")
+            except Exception as e:
+                logger.warning(f"📚 COLLECTIONS: Failed to track collection '{collection}' for user {namespace}: {str(e)}")
+                # Don't fail the entire save operation if collection tracking fails
+                pass
 
         return {"status": "saved", "doc_id": doc_id}
 
@@ -132,21 +156,37 @@ async def search_vector_db(
             else:
                 filter = user_filter
         
+        logger.info(f"📤 SEARCH: Query being embedded: '{clean_query}'")
+        logger.info(f"🎯 SEARCH: Final filter being applied: {filter}")
+        
         # Generate query embedding using clean query (without collection pattern)
         embedding = await safe_pc.embed(
             model="multilingual-e5-large",
             inputs=[clean_query],
             parameters={"input_type": "query", "truncate": "END"}
         )
+        
+        logger.info(f"🦖 SEARCH: Query embedding generated, dimensions: {len(embedding[0]['values'])}")
+        
+        search_params = {
+            "vector": embedding[0]['values'],
+            "top_k": top_k,
+            "include_metadata": True,
+            "filter": filter
+        }
+        
+        logger.info(f"📤 SEARCH: Search parameters being sent to Pinecone:")
+        logger.info(f"   ├─ Vector dimensions: {len(search_params['vector'])}")
+        logger.info(f"   ├─ Top K: {search_params['top_k']}")
+        logger.info(f"   ├─ Include metadata: {search_params['include_metadata']}")
+        logger.info(f"   └─ Filter: {search_params['filter']}")
 
         # Perform vector search using safe wrapper - search in default namespace with metadata filter
-        results = await safe_index.query(
-            vector=embedding[0]['values'],
-            top_k=top_k,
-            include_metadata=True,
-            filter=filter
-            # No namespace parameter = search in default namespace
-        )
+        results = await safe_index.query(**search_params)
+        
+        logger.info(f"📥 SEARCH: Pinecone search results received:")
+        logger.info(f"   ├─ Matches count: {len(results.get('matches', []))}")
+        logger.info(f"   └─ Raw results: {results}")
 
         # Convert to Langchain documents format
         documents = []

@@ -6,7 +6,7 @@ logger = logging.getLogger(__name__)
 
 def extract_collection_from_text(text: Optional[str]) -> Optional[str]:
     """
-    Extract collection name from text using the pattern #collectionname:
+    Extract collection name from text using the pattern @collectionname
     
     Args:
         text: The text to search for collection pattern
@@ -15,15 +15,15 @@ def extract_collection_from_text(text: Optional[str]) -> Optional[str]:
         The extracted collection name or None if no pattern found
         
     Examples:
-        extract_collection_from_text("This is about #books: machine learning") -> "books"
+        extract_collection_from_text("This is about @books machine learning") -> "books"
         extract_collection_from_text("Regular text without pattern") -> None
-        extract_collection_from_text("#music: my favorite songs") -> "music"
+        extract_collection_from_text("@music my favorite songs") -> "music"
     """
     if not text or not isinstance(text, str):
         return None
     
-    # Pattern to match #collectionname: where collectionname can contain letters, numbers, underscores, hyphens
-    pattern = r'#([a-zA-Z0-9_-]+):'
+    # Pattern to match @collectionname where collectionname can contain letters, numbers, underscores, hyphens
+    pattern = r'@([a-zA-Z0-9_-]+)'
     
     try:
         match = re.search(pattern, text.strip())
@@ -52,13 +52,13 @@ def remove_collection_pattern_from_text(text: Optional[str]) -> Optional[str]:
         Text with collection pattern removed
         
     Examples:
-        remove_collection_pattern_from_text("This is about #books: machine learning") -> "This is about machine learning"
+        remove_collection_pattern_from_text("This is about @books machine learning") -> "This is about machine learning"
     """
     if not text or not isinstance(text, str):
         return text
     
-    # Pattern to match #collectionname: 
-    pattern = r'#[a-zA-Z0-9_-]+:\s*'
+    # Pattern to match @collectionname 
+    pattern = r'@[a-zA-Z0-9_-]+\s*'
     
     try:
         cleaned_text = re.sub(pattern, '', text).strip()
