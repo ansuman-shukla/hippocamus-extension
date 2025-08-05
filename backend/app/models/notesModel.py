@@ -7,7 +7,7 @@ def note_model(item):
         'title': item.get('title', None),
         'note': item.get('note', None),
         'date': item.get('date', None),
-        'space': item.get('space', None)
+        'collection': item.get('collection', None)
     }
 
 

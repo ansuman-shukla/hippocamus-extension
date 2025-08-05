@@ -9,7 +9,7 @@ def bookmarkModel(item):
         'source_url': item.get('source_url', None),
         'site_name': item.get('site_name', None),
         'date': item.get('date', None),
-        'space': item.get('space', None)
+        'collection': item.get('collection', None)
     }
 
 def bookmarkModels(items):

@@ -10,6 +10,6 @@ class Memory_Schema(BaseModel):
     date: str
     source_url: str
     type: str
-    space: Optional[str] = None 
+    collection: Optional[str] = None 
 
 

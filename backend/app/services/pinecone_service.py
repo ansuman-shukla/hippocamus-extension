@@ -6,7 +6,7 @@ from langchain_core.documents import Document
 from app.core.config import settings
 from app.schema.link_schema import Link as LinkSchema
 from app.utils.site_name_extractor import extract_site_name
-from app.utils.space_extractor import extract_space_from_text, remove_space_pattern_from_text
+from app.utils.collection_extractor import extract_collection_from_text, remove_collection_pattern_from_text
 from app.services.memories_service import save_memory_to_db
 from app.exceptions.httpExceptionsSearch import *
 from app.exceptions.httpExceptionsSave import *
@@ -31,12 +31,12 @@ async def save_to_vector_db(obj: LinkSchema, namespace: str):
     }
 
     try:
-        # Extract site name and space from note field
+        # Extract site name and collection from note field
         site_name = await extract_site_name(obj.link) or "Unknown Site"
-        space = extract_space_from_text(obj.note) or "general"  # Extract space from note field only, default to "general"
+        collection = extract_collection_from_text(obj.note) or "general"  # Extract collection from note field only, default to "general"
         
-        # Clean the note text for embedding (remove space pattern)
-        clean_note = remove_space_pattern_from_text(obj.note) if obj.note else obj.note
+        # Clean the note text for embedding (remove collection pattern)
+        clean_note = remove_collection_pattern_from_text(obj.note) if obj.note else obj.note
         text_to_embed = f"{obj.title}, {clean_note}, {site_name}"
 
         metadata = {
@@ -44,12 +44,12 @@ async def save_to_vector_db(obj: LinkSchema, namespace: str):
             "user_id": namespace,
             "namespace": namespace,  # Add namespace to metadata for filtering
             "title": obj.title,
-            "note": obj.note,  # Keep original note with space pattern
+            "note": obj.note,  # Keep original note with collection pattern
             "source_url": obj.link,
             "site_name": site_name,
             "type": "Bookmark",
             "date": datetime.now().isoformat(),
-            "space": space, #catagory that memory belongs to 
+            "collection": collection, #catagory that memory belongs to 
         }
 
         # Generate E5 embeddings using safe wrapper
@@ -110,18 +110,18 @@ async def search_vector_db(
         raise InvalidRequestError("Search query must be at least 3 characters")
 
     try:
-        # Extract space from query if present
-        query_space = extract_space_from_text(query)
-        clean_query = remove_space_pattern_from_text(query)
+        # Extract collection from query if present
+        query_collection = extract_collection_from_text(query)
+        clean_query = remove_collection_pattern_from_text(query)
         
         # Create user filter using metadata
         user_filter = {"namespace": {"$eq": namespace}}
         
-        # If space was extracted from query, add it to filter using proper Pinecone syntax
-        if query_space:
-            space_filter = {"space": {"$eq": query_space}}
-            # Combine user filter, space filter and existing filters
-            filters_to_combine = [user_filter, space_filter]
+        # If collection was extracted from query, add it to filter using proper Pinecone syntax
+        if query_collection:
+            collection_filter = {"collection": {"$eq": query_collection}}
+            # Combine user filter, collection filter and existing filters
+            filters_to_combine = [user_filter, collection_filter]
             if filter:
                 filters_to_combine.append(filter)
             filter = {"$and": filters_to_combine}
@@ -132,7 +132,7 @@ async def search_vector_db(
             else:
                 filter = user_filter
         
-        # Generate query embedding using clean query (without space pattern)
+        # Generate query embedding using clean query (without collection pattern)
         embedding = await safe_pc.embed(
             model="multilingual-e5-large",
             inputs=[clean_query],
@@ -161,8 +161,8 @@ async def search_vector_db(
 
 
             if metadata.get('type') == 'Bookmark':
-                # Clean the note content for display (remove space pattern)
-                clean_note = remove_space_pattern_from_text(metadata['note'])
+                # Clean the note content for display (remove collection pattern)
+                clean_note = remove_collection_pattern_from_text(metadata['note'])
                 documents.append(Document(
                 id=doc_id,
                 page_content=f"Title: {metadata['title']}\nNote: {clean_note}\nSource: {metadata['source_url']}",
@@ -170,8 +170,8 @@ async def search_vector_db(
             ))
 
             else:
-                # For notes, clean the note content for display (remove space pattern)
-                clean_note = remove_space_pattern_from_text(metadata['note'])
+                # For notes, clean the note content for display (remove collection pattern)
+                clean_note = remove_collection_pattern_from_text(metadata['note'])
                 documents.append(Document(
                 id=doc_id,
                 page_content=f"Title: {metadata['title']}\nNote: {clean_note}",

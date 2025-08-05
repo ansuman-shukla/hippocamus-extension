@@ -5,7 +5,7 @@ import { useState, useRef, useEffect } from "react";
 import ColorChangingSpinner from "../components/Loader";
 import { GoBookmark } from "react-icons/go";
 import { MdEditNote } from "react-icons/md";
-import { removeSpacePattern } from "../utils/spaceUtils";
+import { removeCollectionPattern } from "../utils/collectionUtils";
 import { api } from "../utils/apiClient";
 
 
@@ -62,7 +62,7 @@ export default function SearchPage({ Quote }: Props) {
                 const responseArray = response.map((item: any) => ({
                     title: item.metadata.title,
                     url: item.metadata.source_url,
-                    content: removeSpacePattern(item.metadata.note),
+                    content: removeCollectionPattern(item.metadata.note),
                     date: item.metadata.date,
                     ID: item.metadata.doc_id,
                     type: item.metadata.type
@@ -99,14 +99,14 @@ export default function SearchPage({ Quote }: Props) {
             const linksArray = linksData.map((item: any) => ({
                 title: item.title,
                 url: item.source_url,
-                content: removeSpacePattern(item.note),
+                content: removeCollectionPattern(item.note),
                 date: item.date,
                 ID: item.doc_id,
                 type: item.type
             }));
             const notesArray = notesData.map((item: any) => ({
                 title: item.title,
-                content: removeSpacePattern(item.note),
+                content: removeCollectionPattern(item.note),
                 date: item.date,
                 ID: item.doc_id,
                 type: item.type

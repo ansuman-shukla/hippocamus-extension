@@ -7,7 +7,7 @@ from app.exceptions.httpExceptionsSearch import *
 from app.exceptions.global_exceptions import ExternalServiceError, DatabaseConnectionError
 from langchain_core.documents import Document
 from app.models.notesModel import *
-from app.utils.space_extractor import extract_space_from_text, remove_space_pattern_from_text
+from app.utils.collection_extractor import extract_collection_from_text, remove_collection_pattern_from_text
 from app.services.pinecone_service import *
 
 async def get_all_notes_from_db(user_id: str):
@@ -41,24 +41,24 @@ async def create_note(note: dict, namespace: str):
     doc_id = f"{namespace}-{timestamp}"
 
     try:
-        # Extract space from note field
-        space = extract_space_from_text(note.note) or "general"
+        # Extract collection from note field
+        collection = extract_collection_from_text(note.note) or "general"
         
-        # Clean the note text for embedding (remove space pattern)
-        clean_note = remove_space_pattern_from_text(note.note) if note.note else note.note
+        # Clean the note text for embedding (remove collection pattern)
+        clean_note = remove_collection_pattern_from_text(note.note) if note.note else note.note
         text_to_embed = f"{note.title}, {clean_note}"
         print(f"Embedding text: {text_to_embed}")
         
-        # Prepare metadata with space information and namespace for filtering
+        # Prepare metadata with collection information and namespace for filtering
         metadata = {
             "doc_id": doc_id,
             "user_id": namespace,
             "namespace": namespace,  # Add namespace to metadata for filtering
             "title": note.title,
-            "note": note.note,  # Keep original note with space pattern
+            "note": note.note,  # Keep original note with collection pattern
             "type": "Note",
             "date": datetime.now().isoformat(),
-            "space": space,  # Add extracted space
+            "collection": collection,  # Add extracted collection
         }
 
         # Generate embeddings using safe wrapper
