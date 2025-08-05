@@ -1,7 +1,7 @@
 // API client for making authenticated requests to the backend
 // Uses cookie-based authentication handled by backend middleware
 
-import { logout } from './authUtils';
+import { logout } from './api';
 
 const getApiBaseUrl = (): string => {
   // Always use the backend API URL for API calls
@@ -33,10 +33,16 @@ export const makeRequest = async <T = any>(
   console.log(`   ├─ Base URL: ${baseUrl}`);
   console.log(`   └─ Method: ${options.method || 'GET'}`);
   
+  // Get tokens from chrome.storage.local
+  const tokens = await chrome.storage.local.get(["access_token", "refresh_token"]);
+  console.log(`   ├─ Access token present: ${!!tokens.access_token}`);
+  console.log(`   └─ Refresh token present: ${!!tokens.refresh_token}`);
+  
   const defaultOptions: RequestInit = {
-    credentials: 'include', // Always use cookies - backend handles auth
+    credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
+      ...(tokens.access_token && { 'Authorization': `Bearer ${tokens.access_token}` }),
       ...options.headers,
     },
     ...options,
@@ -182,23 +188,54 @@ export const api = {
     }),
 };
 
-// Authentication-specific API calls
-export const authApi = {
-  // Login with tokens (sets httpOnly cookies)
-  login: (accessToken: string, refreshToken: string) => 
-    api.post('/auth/login', { access_token: accessToken, refresh_token: refreshToken }),
-  
-  // Logout (clears all auth cookies)
-  logout: () => api.post('/auth/logout'),
-  
-  // Get current auth status
-  status: () => api.get('/auth/status'),
-  
-  // Verify current token
-  verify: () => api.get('/auth/verify'),
-  
-  // Manually refresh token (usually not needed - middleware handles this)
-  refresh: () => api.post('/auth/refresh'),
+
+// Additional API methods that were previously in background.js
+export const submitLink = async (data: any) => {
+  console.log('📤 API CLIENT: Submitting link data');
+  return api.post('/links/save', data);
+};
+
+export const saveNotes = async (data: { title: string; note: string }) => {
+  console.log('📝 API CLIENT: Saving notes data');
+  return api.post('/notes/', data);
+};
+
+export const searchAll = async () => {
+  console.log('🔍 API CLIENT: Fetching all links and notes');
+  const [linksData, notesData] = await Promise.all([
+    api.get('/links/get'),
+    api.get('/notes/')
+  ]);
+  return { links: linksData, notes: notesData };
+};
+
+export const searchLinks = async (query: string, type?: string) => {
+  console.log('🔍 API CLIENT: Searching links');
+  const requestBody: any = { query };
+  if (type && type !== "All") {
+    requestBody.filter = { type: { $eq: type } };
+  }
+  return api.post('/links/search', requestBody);
+};
+
+export const deleteLink = async (docId: string) => {
+  console.log('🗑️ API CLIENT: Deleting link');
+  return api.delete(`/links/delete?doc_id_pincone=${encodeURIComponent(docId)}`);
+};
+
+export const deleteNote = async (docId: string) => {
+  console.log('🗑️ API CLIENT: Deleting note');
+  return api.delete(`/notes/${encodeURIComponent(docId)}`);
+};
+
+export const generateSummary = async (content: string) => {
+  console.log('📄 API CLIENT: Generating summary');
+  return api.post('/summary/generate', { content });
+};
+
+export const getQuotes = async () => {
+  console.log('💬 API CLIENT: Fetching quotes');
+  return api.get('/quotes/');
 };
 
 // Export the main client

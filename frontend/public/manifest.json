@@ -13,12 +13,12 @@
     "bookmarks",
     "cookies",
     "storage",
-    "contextMenus"
+    "contextMenus",
+    "identity"
   ],
   "host_permissions": [
     "http://localhost:5173/*",
     "https://magical-famous-emu.ngrok-free.app/*",
-    "https://extension-auth.vercel.app/*",
     "https://hippocampus-1.onrender.com//*",
     "http://127.0.0.1:8000/*",
     "<all_urls>"
@@ -32,13 +32,6 @@
   "background": {
     "service_worker": "background.js"
   },
-  "content_scripts": [
-    {
-      "matches": ["https://extension-auth.vercel.app/*"],
-      "js": ["auth-content-script.js"],
-      "run_at": "document_end"
-    }
-  ],
   "action": {
     "default_title": "Toggle Sidebar"
   },
@@ -57,5 +50,6 @@
       },
       "description": "Quick search in HippoCampus"
     }
-  }
+  },
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAtTCQJG9ku8pF8htahg1yJCESWF7/fiZNpSC/K9bJ5AW742n4z80oMP8+tbGAYNKjx0zJtXJL1sKnTM7Wa3JQLgnuGe4BYM8ySg+pCtgdWT3ZW6ScIec0KNKEfr/DLPSkxwx20LBYzJFSXOlYyzUXn5h2lKZ9voHx8+z5/F2CXXtgeENjFA4QSejQJJ9JgseTPDsdYhO6GyHJtW6qKXmBwuhv6/IqwDZupb2tLIiSC/kYVtKpbbej9Rg9cJiJx//UrJtyHC9nppOCFhChG50p+0HnKhW++8CCUiDmfRdfVvfffl1f+1FbCziTchRO3oUzHAPF6XjBxk9tO4GhDyc3MwIDAQAB"
 }

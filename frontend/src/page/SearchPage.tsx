@@ -6,6 +6,7 @@ import ColorChangingSpinner from "../components/Loader";
 import { GoBookmark } from "react-icons/go";
 import { MdEditNote } from "react-icons/md";
 import { removeSpacePattern } from "../utils/spaceUtils";
+import { api } from "../utils/apiClient";
 
 
 interface Props {
@@ -38,107 +39,117 @@ export default function SearchPage({ Quote }: Props) {
         return () => clearTimeout(timer);
     }, []);
 
-    const handleSearch = () => {
+    const handleSearch = async () => {
         setIsLoading(true);
-        chrome.runtime.sendMessage({ action: "search", query: query, type: activeTab },
-            (response) => {
-                setIsLoading(false);
-                
-                if (response && response.success) {
-                    if (response.data?.detail === "Search failed: No documents found matching query") {
-                        Navigate("/response", { state: { data: [] } });
-                        return;
-                    } else {
-                        console.log("The response is:", response.data);
-                        const responseArray = response.data.map((item: any) => ({
-                            title: item.metadata.title,
-                            url: item.metadata.source_url,
-                            content: removeSpacePattern(item.metadata.note),
-                            date: item.metadata.date,
-                            ID: item.metadata.doc_id,
-                            type: item.metadata.type
-                        }));
-                        Navigate("/response", { state: { data: responseArray, Query: query } });
-                    }
-                } else {
-                    console.error("Search error:", response?.error);
-                    const errorMessage = response?.error || "Search failed";
-                    
-                    if (errorMessage.includes("No documents found matching query")) {
-                        Navigate("/response", { state: { data: [], Query: query } });
-                    } else {
-                        Navigate("/response", { state: { data: [], Query: query, error: errorMessage } });
-                    }
-                }
-            }
-        )
-    };
-    const handleSearchAll = () => {
-        setIsLoading(true);
-        chrome.runtime.sendMessage({ action: "searchAll" },
-            (response) => {
-                setIsLoading(false);
-                
-                if (response && response.success) {
-                    if (response.data?.detail === "Search failed: No documents found matching query") {
-                        console.log("No documents found matching query");
-                        Navigate("/response", { state: { data: [] } });
-                        return;
-                    } else {
-                        const linksArray = response.links.map((item: any) => ({
-                            title: item.title,
-                            url: item.source_url,
-                            content: removeSpacePattern(item.note),
-                            date: item.date,
-                            ID: item.doc_id,
-                            type: item.type
-                        }));
-                        const notesArray = response.notes.map((item: any) => ({
-                            title: item.title,
-                            content: removeSpacePattern(item.note),
-                            date: item.date,
-                            ID: item.doc_id,
-                            type: item.type
-                        }));
-                        console.log("The links array is from search all: ", linksArray);
-                        console.log("The notes array is from search all:", notesArray);
-                        const responseArray = [...linksArray, ...notesArray];
-                        Navigate("/response", { state: {data: responseArray, Query: " ", isSearchAll:true} });
-                    }
-                } else {
-                    console.error("SearchAll Error:", response?.error);
-                    
-                    // Enhanced authentication error detection
-                    const errorMessage = response?.error || '';
-                    const isAuthError = (
-                        errorMessage.includes('Authentication required') ||
-                        errorMessage.includes('authentication failed') ||
-                        errorMessage.includes('fetch failed: 401') ||
-                        errorMessage.includes('401') ||
-                        errorMessage.includes('Session expired') ||
-                        errorMessage.includes('Please log in again') ||
-                        errorMessage.includes('Invalid Refresh Token')
-                    );
-                    
-                    if (isAuthError) {
-                        console.log("🚫 SEARCH: Authentication error detected, redirecting to intro page");
-                        Navigate("/");
-                        return;
-                    }
-                    
-                    // Handle other errors
-                    Navigate("/response", { 
-                        state: { 
-                            data: [], 
-                            Query: " ", 
-                            isSearchAll: true, 
-                            error: response?.error || "Failed to fetch data" 
-                        } 
-                    });
-                }
-            }
-        )
+        try {
+            console.log('🔍 SEARCH: Starting search request via apiClient');
+            
+            const requestBody: any = {
+                query: query
+            };
 
+            if (activeTab !== "All") {
+                requestBody.filter = { type: { $eq: activeTab } };
+            }
+
+            const response = await api.post('/links/search', requestBody);
+            
+            if (response?.detail === "Search failed: No documents found matching query") {
+                Navigate("/response", { state: { data: [] } });
+                return;
+            } else {
+                console.log("The response is:", response);
+                const responseArray = response.map((item: any) => ({
+                    title: item.metadata.title,
+                    url: item.metadata.source_url,
+                    content: removeSpacePattern(item.metadata.note),
+                    date: item.metadata.date,
+                    ID: item.metadata.doc_id,
+                    type: item.metadata.type
+                }));
+                Navigate("/response", { state: { data: responseArray, Query: query } });
+            }
+        } catch (error: any) {
+            console.error("Search error:", error);
+            const errorMessage = error?.message || "Search failed";
+            
+            if (errorMessage.includes("No documents found matching query")) {
+                Navigate("/response", { state: { data: [], Query: query } });
+            } else {
+                Navigate("/response", { state: { data: [], Query: query, error: errorMessage } });
+            }
+        } finally {
+            setIsLoading(false);
+        }
+    };
+    const handleSearchAll = async () => {
+        setIsLoading(true);
+        try {
+            console.log('🔍 SEARCH: Starting searchAll request via apiClient');
+            
+            // Make both API calls in parallel
+            const [linksData, notesData] = await Promise.all([
+                api.get('/links/get'),
+                api.get('/notes/')
+            ]);
+            
+            console.log('📦 SEARCH: Links data received via apiClient');
+            console.log('📦 SEARCH: Notes data received via apiClient');
+            
+            const linksArray = linksData.map((item: any) => ({
+                title: item.title,
+                url: item.source_url,
+                content: removeSpacePattern(item.note),
+                date: item.date,
+                ID: item.doc_id,
+                type: item.type
+            }));
+            const notesArray = notesData.map((item: any) => ({
+                title: item.title,
+                content: removeSpacePattern(item.note),
+                date: item.date,
+                ID: item.doc_id,
+                type: item.type
+            }));
+            
+            console.log("The links array is from search all: ", linksArray);
+            console.log("The notes array is from search all:", notesArray);
+            const responseArray = [...linksArray, ...notesArray];
+            Navigate("/response", { state: {data: responseArray, Query: " ", isSearchAll:true} });
+            
+        } catch (error: any) {
+            console.error("SearchAll Error:", error);
+            
+            // Enhanced authentication error detection
+            const errorMessage = error?.message || '';
+            const isAuthError = (
+                errorMessage.includes('Authentication required') ||
+                errorMessage.includes('authentication failed') ||
+                errorMessage.includes('fetch failed: 401') ||
+                errorMessage.includes('401') ||
+                errorMessage.includes('Session expired') ||
+                errorMessage.includes('Please log in again') ||
+                errorMessage.includes('Invalid Refresh Token')
+            );
+            
+            if (isAuthError) {
+                console.log("🚫 SEARCH: Authentication error detected, redirecting to intro page");
+                Navigate("/");
+                return;
+            }
+            
+            // Handle other errors
+            Navigate("/response", { 
+                state: { 
+                    data: [], 
+                    Query: " ", 
+                    isSearchAll: true, 
+                    error: error?.message || "Failed to fetch data" 
+                } 
+            });
+        } finally {
+            setIsLoading(false);
+        }
     };
 
 

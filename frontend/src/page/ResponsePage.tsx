@@ -1,9 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import InputForm from "../components/InputForm";
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef } from "react";
 import { BiSearchAlt2 } from "react-icons/bi";
 import '../index.css';
 import isUrlHttp from "is-url-http";
+import { submitLink, saveNotes } from "../utils/apiClient";
 
 interface FormData {
   link: string;
@@ -13,8 +14,6 @@ interface FormData {
 
 export default function ResponsePage() {
 
-  const [title, setTitle] = useState("Good Morning");
-  const [subTxt, setSubTxt] = useState("User");
   const [leftBtnTxt, setLftBtnTxt] = useState("SUMMARIZE");
   const [BtnTxtClr, setBtnTxtClr] = useState("--primary-yellow");
   const [rightBtnTxt, setRtBtnTxt] = useState("MEMORIZE");
@@ -37,80 +36,7 @@ export default function ResponsePage() {
   }
 
 
-  useEffect(() => {
-    if(new Date().getHours()<5){
-      setTitle("Go & Sleep,");
-    }
-    else if( new Date().getHours() < 12){
-      setTitle("Good Morning,")
-    }else if(new Date().getHours() < 17){
-      setTitle("Good Afternoon,")
-    }else if( new Date().getHours() < 20){
-      setTitle("Good Evening,")
-    }else{
-      setTitle("Good Night,")
-    } 
-  }, []);
 
-  useEffect(() => {
-    // First check localStorage for cached username
-    const cachedUsername = localStorage.getItem('user_name');
-    
-    if (cachedUsername) {
-      // Process cached username to ensure it follows the same rules (first name, max 8 chars)
-      const firstName = cachedUsername.split(" ")[0];
-      const processedUsername = firstName.length > 8 ? firstName.substring(0, 8) : firstName;
-      
-      console.log('Using cached username from localStorage:', processedUsername);
-      setSubTxt(processedUsername);
-      
-      // Update localStorage if the cached value was different (full name)
-      if (processedUsername !== cachedUsername) {
-        localStorage.setItem('user_name', processedUsername);
-        console.log('Updated cached username to processed version');
-      }
-    } else {
-      // If not in localStorage, fetch from cookies (existing logic)
-      console.log('Username not found in localStorage, fetching from cookies...');
-      chrome.cookies.get({url: import.meta.env.VITE_BACKEND_URL, name:'user_name'},(cookie)=>{
-        if(cookie){
-          // Extract first name and truncate to 8 characters if needed
-          const fullName = cookie.value.replace(/"/g, "");
-          const firstName = fullName.split(" ")[0];
-          const username = firstName.length > 8 ? firstName.substring(0, 8) : firstName;
-          
-          console.log('Username processed from cookies:', username);
-          
-          // Set the username in the UI
-          setSubTxt(username);
-          
-          // Cache it in localStorage for future use
-          localStorage.setItem('user_name', username);
-          console.log('Username cached in localStorage for future use');
-        } else {
-          console.log('No username found in cookies, trying to fetch auth status');
-          // As a fallback, try to get auth status which should populate localStorage
-          fetch(`${import.meta.env.VITE_BACKEND_URL}/auth/status`, {
-            method: 'GET',
-            credentials: 'include',
-          })
-            .then(response => response.json())
-            .then(data => {
-              if (data.is_authenticated && data.full_name) {
-                const firstName = data.full_name.split(" ")[0];
-                const username = firstName.length > 8 ? firstName.substring(0, 8) : firstName;
-                setSubTxt(username);
-                localStorage.setItem('user_name', username);
-                console.log('Username fetched from auth status and cached');
-              }
-            })
-            .catch(error => {
-              console.log('Failed to fetch auth status:', error);
-            });
-        }
-      });
-    }
-  }, []);
 
 
 
@@ -141,7 +67,7 @@ export default function ResponsePage() {
   };
 
 
-  const handleResponse = (e: React.FormEvent) => {
+  const handleResponse = async (e: React.FormEvent) => {
     e.preventDefault();
 
 
@@ -164,62 +90,44 @@ export default function ResponsePage() {
       setisError('')
       setnotSubmitted(false);
 
-     (currentTab === "submit" ? chrome.runtime.sendMessage({ action: "submit", data: formData }, (response) => {
-        console.log("Frontend received response:", response);
-        if (response && response.success) {
+      try {
+        if (currentTab === "submit") {
+          console.log("Frontend submitting link data:", formData);
+          const response = await submitLink(formData);
+          console.log("Frontend received link response:", response);
+          
           setIsLoading(false);
           setbgClr("--primary-green")
-          setTitle("Successful !")
-          setSubTxt("Your entry has been saved.")
           setLftBtnTxt("CLOSE")
           setBtnTxtClr("--primary-green")
           setRtBtnTxt("HOME")
           setShowOnlyOne(true)
         } else {
+          const noteData = {
+            title: NotesTitle,
+            note: extraNote
+          };
+          console.log("Frontend submitting note data:", noteData);
+          const response = await saveNotes(noteData);
+          console.log("Frontend received note response:", response);
+          
           setIsLoading(false);
-          console.error("API Error:", response);
-          setbgClr("--primary-orange")
-          setTitle("Error !")
-          setSubTxt("Something went wrong")
-          setLftBtnTxt("Home")
-          setBtnTxtClr("--primary-orange")
-          setRtBtnTxt("RETRY :)")
-          setisError("API Error")
+          setbgClr("--primary-green")
+          setLftBtnTxt("CLOSE")
+          setBtnTxtClr("--primary-green")
+          setRtBtnTxt("HOME")
+          setShowOnlyOne(true)
         }
-      }) : (
-        chrome.runtime.sendMessage({ action: "saveNotes", data: {
-          title: NotesTitle,
-          note: extraNote
-        } }, (response) => {
-          console.log("Frontend received saveNotes response:", response);
-          if (response && response.success) {
-            setIsLoading(false);
-            setbgClr("--primary-green")
-            setTitle("Successful !")
-            setSubTxt("Your notes has been saved.")
-            setLftBtnTxt("CLOSE")
-            setBtnTxtClr("--primary-green")
-            setRtBtnTxt("HOME")
-            setShowOnlyOne(true)
-          } else {
-            setIsLoading(false);
-            console.error("API Error:", response);
-            setbgClr("--primary-orange")
-            setTitle("Error !")
-            setSubTxt("Something went wrong")
-            setLftBtnTxt("BACK")
-            setBtnTxtClr("--primary-orange")
-            setRtBtnTxt("RETRY :)")
-            setisError("API Error")
-          }
-        })
-      )
-    
-     )
-
+      } catch (error: any) {
+        setIsLoading(false);
+        console.error("API Error:", error);
+        setbgClr("--primary-orange")
+        setLftBtnTxt(currentTab === "submit" ? "Home" : "BACK")
+        setBtnTxtClr("--primary-orange")
+        setRtBtnTxt("RETRY :)")
+        setisError(error?.message || "API Error")
+      }
     }
-
-
   }
 
   const handleClear = () => {
@@ -263,8 +171,6 @@ export default function ResponsePage() {
 
         <div className="flex justify-between items-center mb-6 gap-2 ">
           <div className='flex flex-col justify-end  -gap-2'>
-            <h1 className="text-[18px] font-NanumMyeongjo pr-2">{title}</h1>
-            <p className={`${(subTxt==="Your entry has been saved." || subTxt==="Something went wrong")?'text-[24px]':'text-[28px]'} text-black font-NanumMyeongjo mt-[-8px]`}>{subTxt}</p>
           </div>
           {notSubmitted ?
             <div

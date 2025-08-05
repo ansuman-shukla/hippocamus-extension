@@ -8,54 +8,35 @@ if (window.hippoCampusContentScriptLoaded) {
   console.log("♻️ CONTENT STEP 0: HippoCampus content script already loaded, executing toggle only");
   console.log("   ├─ This is a re-execution of the content script (not first load)");
   
-  // Use global state to check current status
-  const state = window.hippoCampusExtensionState || { isOpen: false, isInitializing: false };
-  console.log('📊 CONTENT STEP 0: Checking global extension state');
-  console.log(`   ├─ state.isOpen: ${state.isOpen}`);
-  console.log(`   ├─ state.isInitializing: ${state.isInitializing}`);
+  // Simple toggle logic - always check DOM first, ignore state inconsistencies
+  const existingSidebar = document.getElementById("my-extension-sidebar");
+  console.log('🔍 CONTENT STEP 0: Simple toggle - checking DOM for existing sidebar');
+  console.log(`   ├─ existingSidebar found: ${!!existingSidebar}`);
   
-  // Prevent multiple simultaneous operations
-  if (state.isInitializing) {
-    console.log("⚠️ CONTENT STEP 0: Extension operation already in progress, ignoring toggle");
-    console.log("   ├─ Another operation is in progress, avoiding race condition");
-  } else {
-    // Handle toggle for already loaded script
-    const existingSidebar = document.getElementById("my-extension-sidebar");
-    console.log('🔍 CONTENT STEP 0: Checking for existing sidebar');
-    console.log(`   ├─ existingSidebar found: ${!!existingSidebar}`);
-    console.log(`   ├─ state.isOpen: ${state.isOpen}`);
-    
-    if (existingSidebar && state.isOpen) {
-      // Close existing sidebar
-      console.log("📴 CONTENT STEP 0: Closing existing sidebar via global function");
-      if (window.hippoCampusCloseSidebar) {
-        console.log("   ├─ Using global hippoCampusCloseSidebar function");
-        window.hippoCampusCloseSidebar(existingSidebar);
-      } else {
-        console.log("⚠️ CONTENT STEP 0: Global close function not available, using fallback");
-        state.isOpen = false;
-        existingSidebar.style.animation = "slideOut 0.3s ease-in-out forwards";
-        setTimeout(() => {
-          if (existingSidebar.parentNode) {
-            existingSidebar.remove();
-          }
-          document.removeEventListener("click", window.hippoCampusHandleClickOutside);
-        }, 300);
-      }
-    } else if (!existingSidebar && !state.isOpen) {
-      // Create new sidebar
-      console.log("📱 CONTENT STEP 0: Creating new sidebar via global function");
-      if (window.hippoCampusCreateSidebar) {
-        console.log("   ├─ Using global hippoCampusCreateSidebar function");
-        window.hippoCampusCreateSidebar();
-      } else {
-        console.log("⚠️ CONTENT STEP 0: Global create function not available");
-      }
+  if (existingSidebar) {
+    // Sidebar exists in DOM - close it
+    console.log("📴 CONTENT STEP 0: Sidebar exists - closing it");
+    if (window.hippoCampusCloseSidebar) {
+      console.log("   ├─ Using global hippoCampusCloseSidebar function");
+      window.hippoCampusCloseSidebar(existingSidebar);
     } else {
-      console.log(`❓ CONTENT STEP 0: No action taken`);
-      console.log(`   ├─ existingSidebar: ${!!existingSidebar}`);
-      console.log(`   ├─ state.isOpen: ${state.isOpen}`);
-      console.log("   ├─ This might indicate an inconsistent state");
+      console.log("⚠️ CONTENT STEP 0: Global close function not available, using fallback");
+      existingSidebar.style.animation = "slideOut 0.3s ease-in-out forwards";
+      setTimeout(() => {
+        if (existingSidebar.parentNode) {
+          existingSidebar.remove();
+        }
+        document.removeEventListener("click", window.hippoCampusHandleClickOutside);
+      }, 300);
+    }
+  } else {
+    // No sidebar in DOM - create it
+    console.log("📱 CONTENT STEP 0: No sidebar exists - creating new one");
+    if (window.hippoCampusCreateSidebar) {
+      console.log("   ├─ Using global hippoCampusCreateSidebar function");
+      window.hippoCampusCreateSidebar();
+    } else {
+      console.log("⚠️ CONTENT STEP 0: Global create function not available");
     }
   }
 } else {
@@ -158,34 +139,57 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       .filter(text => text.length > 2 && !seen.has(text) && seen.add(text)); 
 
     let content = lines.join('\n').replace(/\n{2,}/g, '\n');
-    chrome.runtime.sendMessage(
-      { action: "generateSummaryforContent", content: content, cookies: localStorage.getItem("access_token") },
-      (response) => {
-        // Reset the flag when request completes
-        isGeneratingSummary = false;
-        
-        if (response && response.success) {
-          console.log("Content sent to background script");
-          console.log("Summary:", response.data.summary);
-          sendResponse({ content: response.data.summary });
-        } else {
-          const errorMessage = response?.error || "Failed to send content to background script";
-          
-          // Handle rate limit error specifically
-          if (errorMessage === 'RATE_LIMIT_EXCEEDED') {
-            console.log("🚫 CONTENT: Rate limit exceeded for summary generation");
-            console.log("   ├─ This is a legitimate daily limit reached");
-            sendResponse({ 
-              error: 'RATE_LIMIT_EXCEEDED'
-            });
-          } else {
-            console.error("❌ CONTENT: Failed to send content to background script:", errorMessage);
-            console.log("   ├─ This is NOT a rate limit error, it's:", errorMessage);
-            sendResponse({ error: errorMessage });
+    
+    // Send message to extension frontend to handle API call
+    const sidebar = document.getElementById("my-extension-sidebar");
+    if (sidebar) {
+      const iframe = sidebar.querySelector('iframe');
+      if (iframe) {
+        // Create a promise to handle the response
+        const messageId = Date.now() + Math.random();
+        const responseHandler = (event) => {
+          if (event.data && event.data.messageId === messageId) {
+            window.removeEventListener('message', responseHandler);
+            isGeneratingSummary = false;
+            
+            if (event.data.success) {
+              console.log("Content summarized successfully");
+              console.log("Summary:", event.data.data);
+              sendResponse({ content: event.data.data });
+            } else {
+              const errorMessage = event.data.error || "Failed to generate summary";
+              
+              // Handle rate limit error specifically
+              if (errorMessage === 'RATE_LIMIT_EXCEEDED') {
+                console.log("🚫 CONTENT: Rate limit exceeded for summary generation");
+                console.log("   ├─ This is a legitimate daily limit reached");
+                sendResponse({ 
+                  error: 'RATE_LIMIT_EXCEEDED'
+                });
+              } else {
+                console.error("❌ CONTENT: Failed to generate summary:", errorMessage);
+                sendResponse({ error: errorMessage });
+              }
+            }
           }
-        }
+        };
+        
+        window.addEventListener('message', responseHandler);
+        
+        // Send message to iframe
+        iframe.contentWindow.postMessage({ 
+          action: "generateSummary", 
+          content: content,
+          messageId: messageId
+        }, "*");
+      } else {
+        isGeneratingSummary = false;
+        sendResponse({ error: "Extension iframe not found" });
       }
-    );
+    } else {
+      isGeneratingSummary = false;
+      sendResponse({ error: "Extension not open" });
+    }
     return true;
   }
 });
@@ -343,70 +347,22 @@ window.hippoCampusCreateSidebar = createSidebar;
   console.log(`   ├─ Current URL: ${window.location.href}`);
   console.log(`   ├─ Document ready state: ${document.readyState}`);
   
-  // Check current extension state
-  console.log('📊 CONTENT STEP 4: Checking current extension state');
-  console.log(`   ├─ extensionState.isInitializing: ${extensionState.isInitializing}`);
-  console.log(`   ├─ extensionState.isOpen: ${extensionState.isOpen}`);
-  
-  // Prevent multiple simultaneous operations
-  if (extensionState.isInitializing) {
-    console.log("⚠️ CONTENT STEP 4: Extension operation already in progress, ignoring toggle");
-    console.log("   ├─ This prevents race conditions during sidebar creation/destruction");
-    return;
-  }
-
-  // Check if sidebar already exists in DOM
-  let existingSidebar = document.getElementById("my-extension-sidebar");
-  console.log('🔍 CONTENT STEP 4: Checking for existing sidebar in DOM');
+  // Simple DOM-based toggle - ignore state inconsistencies
+  const existingSidebar = document.getElementById("my-extension-sidebar");
+  console.log('🔍 CONTENT STEP 4: Simple toggle - checking DOM for existing sidebar');
   console.log(`   ├─ Existing sidebar found: ${!!existingSidebar}`);
   
   if (existingSidebar) {
-    console.log(`   ├─ Sidebar element ID: ${existingSidebar.id}`);
-    console.log(`   ├─ Sidebar display: ${window.getComputedStyle(existingSidebar).display}`);
-    console.log(`   ├─ Sidebar visibility: ${window.getComputedStyle(existingSidebar).visibility}`);
-  }
-
-  // Decision logic for toggle action
-  console.log('🤔 CONTENT STEP 4: Determining toggle action');
-  
-  // If sidebar exists and state says it's open, close it (toggle off)
-  if (existingSidebar && extensionState.isOpen) {
-    console.log('📴 CONTENT STEP 4: Sidebar exists and is open -> CLOSING sidebar');
+    // Sidebar exists in DOM - close it
+    console.log('📴 CONTENT STEP 4: Sidebar exists - closing it');
     console.log('   ├─ Calling closeSidebar function');
     closeSidebar(existingSidebar);
-    return;
-  }
-
-  // If no sidebar exists and state says it's closed, create it (toggle on)
-  if (!existingSidebar && !extensionState.isOpen) {
-    console.log('📱 CONTENT STEP 4: No sidebar exists and state is closed -> CREATING sidebar');
+  } else {
+    // No sidebar in DOM - create it
+    console.log('📱 CONTENT STEP 4: No sidebar exists - creating new one');
     console.log('   ├─ Calling createSidebar function');
     createSidebar();
-    return;
   }
-  
-  // Handle inconsistent states
-  if (existingSidebar && !extensionState.isOpen) {
-    console.log('⚠️ CONTENT STEP 4: INCONSISTENT STATE - Sidebar exists but state says closed');
-    console.log('   ├─ Syncing state to match DOM reality');
-    extensionState.isOpen = true;
-    console.log('   ├─ Now closing sidebar to complete toggle');
-    closeSidebar(existingSidebar);
-    return;
-  }
-  
-  if (!existingSidebar && extensionState.isOpen) {
-    console.log('⚠️ CONTENT STEP 4: INCONSISTENT STATE - No sidebar but state says open');
-    console.log('   ├─ Syncing state to match DOM reality');
-    extensionState.isOpen = false;
-    console.log('   ├─ Now creating sidebar to complete toggle');
-    createSidebar();
-    return;
-  }
-  
-  console.log('❓ CONTENT STEP 4: Unexpected state combination, no action taken');
-  console.log(`   ├─ existingSidebar: ${!!existingSidebar}`);
-  console.log(`   ├─ extensionState.isOpen: ${extensionState.isOpen}`);
 })();
 
 } // Close the else block for script loading check

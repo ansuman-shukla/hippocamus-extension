@@ -1,6 +1,6 @@
 #my-extension-sidebar {
   position: fixed;
-  top: 20%;
+  top: 50%;
   right: 20px;
   width: 420px;
   height: 500px;
@@ -10,30 +10,26 @@
   transition: transform 0.3s ease-in-out;
   border-left: transparent !important;
   overflow: hidden !important;
-  animation: slideIn 0.3s ease-in-out forwards;
-
-}
-
-#my-extension-sidebar {
-transform: translateX(100%);
+  /* Start hidden (off-screen to the right) */
+  transform: translateY(-50%) translateX(100%);
 }
 
 @keyframes slideIn {
-from {
-  transform: translateX(100%);
-}
-to {
-  transform: translateX(0);
-}
+  from {
+    transform: translateY(-50%) translateX(100%);
+  }
+  to {
+    transform: translateY(-50%) translateX(0);
+  }
 }
 
 @keyframes slideOut {
-from {
-  transform: translateX(0);
-}
-to {
-  transform: translateX(100%);
-}
+  from {
+    transform: translateY(-50%) translateX(0);
+  }
+  to {
+    transform: translateY(-50%) translateX(100%);
+  }
 }
 
 

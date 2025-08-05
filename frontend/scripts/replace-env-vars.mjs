@@ -53,26 +53,12 @@ if (existsSync(manifestPath)) {
   let manifestContent = readFileSync(manifestPath, 'utf8');
   const manifest = JSON.parse(manifestContent);
   
-  // Update host permissions
+  // Update host permissions to use actual backend URL
   manifest.host_permissions = manifest.host_permissions.map(permission => {
-    if (permission.includes('extension-auth.vercel.app')) {
-      return `${new URL(API_URL).origin}/*`;
-    }
-    if (permission.includes('hippocampus-cyfo.onrender.com')) {
+    if (permission.includes('hippocampus-1.onrender.com')) {
       return `${new URL(BACKEND_URL).origin}/*`;
     }
     return permission;
-  });
-  
-  // Update content scripts
-  manifest.content_scripts = manifest.content_scripts.map(script => {
-    script.matches = script.matches.map(match => {
-      if (match.includes('extension-auth.vercel.app')) {
-        return `${new URL(API_URL).origin}/*`;
-      }
-      return match;
-    });
-    return script;
   });
   
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));

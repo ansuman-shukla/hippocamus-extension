@@ -1,6 +1,6 @@
 // Configuration - will be replaced during build
-const BACKEND_URL = 'https://hippocampus-1.onrender.com';
-// const BACKEND_URL = 'http://127.0.0.1:8000';
+// const BACKEND_URL = 'https://hippocampus-1.onrender.com';
+const BACKEND_URL = 'http://localhost:8000';
 const API_URL = '__VITE_API_URL__';
 
 // BACKGROUND SCRIPT STARTUP LOGGING
@@ -25,8 +25,21 @@ chrome.commands.getAll((commands) => {
 });
 
 // Test if action listener is properly set up
-console.log('🔧 BACKGROUND: Setting up extension action listener');
-console.log('   ├─ This should respond to Alt+M and extension icon clicks');
+console.log('🔧 BACKGROUND: Setting up auth listener');
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message.action === "checkAuthStatus") {
+    chrome.storage.local.get(['access_token', 'refresh_token'], (result) => {
+      const { access_token, refresh_token } = result;
+      if (!access_token || !refresh_token) {
+        console.log('No valid tokens found, starting auth flow');
+        startAuthFlow();
+      } else {
+        console.log('Valid tokens found');
+      }
+    });
+  }
+});
 
 // Add runtime startup event listener
 chrome.runtime.onStartup.addListener(() => {
@@ -132,6 +145,7 @@ async function clearAllAuthCookies() {
     'https://hippocampus-1.onrender.com',
     'https://extension-auth.vercel.app',
     'http://127.0.0.1:8000',
+    'http://localhost:8000',
     BACKEND_URL
   ];
   
@@ -424,12 +438,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         
         while (retryCount < maxRetries) {
           try {
+            // Get tokens from chrome.storage.local
+            const tokens = await chrome.storage.local.get(["access_token", "refresh_token"]);
+            const headers = { 'Content-Type': 'application/json' };
+            
+            // Add Authorization header if token exists
+            if (tokens.access_token) {
+              headers['Authorization'] = `Bearer ${tokens.access_token}`;
+              console.log('🔑 BACKGROUND: Added Authorization header to saveNotes request');
+            } else {
+              console.log('⚠️  BACKGROUND: No access token found in storage for saveNotes');
+            }
+            
             response = await fetch(`${BACKEND_URL}/notes/`, {
               method: 'POST',
               credentials: 'include',
-              headers: {
-                'Content-Type': 'application/json'
-              },
+              headers: headers,
               body: JSON.stringify(message.data)
             });
             
@@ -618,10 +642,22 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         
         while (retryCount < maxRetries) {
           try {
+            // Get tokens from chrome.storage.local
+            const tokens = await chrome.storage.local.get(["access_token", "refresh_token"]);
+            const headers = { 'Content-Type': 'application/json' };
+            
+            // Add Authorization header if token exists
+            if (tokens.access_token) {
+              headers['Authorization'] = `Bearer ${tokens.access_token}`;
+              console.log('🔑 BACKGROUND: Added Authorization header to request');
+            } else {
+              console.log('⚠️  BACKGROUND: No access token found in storage');
+            }
+            
             response = await fetch(`${BACKEND_URL}/summary/generate`, {
               method: 'POST',
               credentials: 'include',
-              headers: { 'Content-Type': 'application/json' },
+              headers: headers,
               body: JSON.stringify({ content: message.content })
             });
             

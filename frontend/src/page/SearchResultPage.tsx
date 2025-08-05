@@ -5,6 +5,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import '../index.css';
 import LoaderPillars from '../components/LoaderPillars';
 import ToggleTabs from '../components/toggleTab';
+import { deleteLink, deleteNote } from '../utils/apiClient';
 
 // interface ProcessedResult {
 //   title: string;
@@ -228,7 +229,7 @@ const SearchResponse: React.FC = () => {
     console.log("Filtered browser bookmarks: ", filteredBrowserBookmarks);
   }, [filteredBrowserBookmarks]);
 
-  const handleDelete = () => {
+  const handleDelete = async () => {
     setIsLoading(true);
     if (selectedIndex !== null) {
       const cardToDelete = Card[selectedIndex];
@@ -240,25 +241,28 @@ const SearchResponse: React.FC = () => {
       console.log("==================");
       
       const isNote = cardToDelete.type === "Note";
-      const action = isNote ? "deleteNote" : "delete";
       
-      chrome.runtime.sendMessage({ action: action, query: cardToDelete.ID }, (response) => {
-        if (response && response.success) {
-          // Successfully deleted from backend, now remove from UI
-          setCards(prevCards => prevCards.filter((_, index) => index !== selectedIndex));
-          setSelectedIndex(null);
-          setDeleteSuccess(true);
-          setIsLoading(false);
-          setConfirmDelete(true);
-          
-          console.log(`Successfully deleted ${isNote ? 'note' : 'bookmark'}:`, cardToDelete);
+      try {
+        if (isNote) {
+          await deleteNote(cardToDelete.ID);
         } else {
-          console.error("Delete failed:", response?.error);
-          setDeleteSuccess(false);
-          setIsLoading(false);
-          setConfirmDelete(true);
+          await deleteLink(cardToDelete.ID);
         }
-      });
+        
+        // Successfully deleted from backend, now remove from UI
+        setCards(prevCards => prevCards.filter((_, index) => index !== selectedIndex));
+        setSelectedIndex(null);
+        setDeleteSuccess(true);
+        setIsLoading(false);
+        setConfirmDelete(true);
+        
+        console.log(`Successfully deleted ${isNote ? 'note' : 'bookmark'}:`, cardToDelete);
+      } catch (error: any) {
+        console.error("Delete failed:", error);
+        setDeleteSuccess(false);
+        setIsLoading(false);
+        setConfirmDelete(true);
+      }
     } else {
       setIsLoading(false);
     }
