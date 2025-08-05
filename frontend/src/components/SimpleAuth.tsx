@@ -3,6 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { logout, checkAuthStatus } from '../utils/api';
 
+// Extend Window interface to include our auth check flag
+declare global {
+  interface Window {
+    authChecked?: boolean;
+  }
+}
+
 const SUPABASE_URL = "https://dzftiemmhvmtrlooukqd.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6ZnRpZW1taHZtdHJsb291a3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2MTQ5NjEsImV4cCI6MjA1NDE5MDk2MX0.pFPUNjrL52biBlNmwcSwJRxhQ7mx1Elqnh_6OOVABM4";
 
@@ -54,6 +61,15 @@ export function useSimpleAuth() {
   const [error, setError] = useState('');
 
   useEffect(() => {
+    // Prevent duplicate auth checks by using a global flag
+    if (window.authChecked) {
+      console.log('🔍 Auth check already performed, skipping duplicate check');
+      setLoading(false);
+      return;
+    }
+    
+    window.authChecked = true;
+    
     // Check if user is already logged in on component mount
     const checkUser = async () => {
       console.log('🔍 Checking if user is already logged in...');
