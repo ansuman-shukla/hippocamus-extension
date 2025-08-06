@@ -142,7 +142,7 @@ export default function InputForm({
                 }
               }
             }}
-            className="w-full text-[16px] border-b border-black bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-1 scrollbar-hide"
+            className="w-full text-[15px] border-b border-black bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-1 scrollbar-hide"
             placeholder="Add micro-note for better search results (press Enter to save)"
             disabled={isLoading || showOnlyOne}
           />
@@ -161,7 +161,7 @@ export default function InputForm({
           rows={1}
           value={NotesTitle}
           onChange={e => setNotesTitle(e.target.value)}
-          className="w-full bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-3  border-b border-black scrollbar-hide"
+          className="w-full text-[15px] bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-3  border-b border-black scrollbar-hide"
           placeholder="Your title here..."
           disabled={isLoading || showOnlyOne}
         />
@@ -179,7 +179,7 @@ export default function InputForm({
               }
             }
           }}
-          className="w-full bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-3  border-b border-black scrollbar-hide"
+          className="w-full text-[15px] bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-3  border-b border-black scrollbar-hide"
           placeholder="Write your note here... (Press Enter to save)"
           disabled={isLoading || showOnlyOne}
         />
@@ -193,7 +193,7 @@ export default function InputForm({
         </div>
       ) : null}
 
-      <div className={`flex ${showOnlyOne ? 'justify-center' : 'justify-between'} mx-auto mt-2 ${Error ? "pt-4" : "pt-8"}`}>
+      <div className={`flex ${showOnlyOne ? 'justify-center' : 'justify-between'} mx-auto ${Error ? "pt-4" : "pt-8"}`} style={{ marginTop: '6px' }}>
         {isLoading ? (
           <div className="flex justify-center w-full">
             <LoaderPillars />

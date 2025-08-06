@@ -87,12 +87,12 @@ export default function CollectionsDropdown({
           disabled={isDisabled || isLoading}
           className={`
             bg-[#ffea67] border border-black rounded-full px-4 py-2.5 
-            flex items-center justify-between font-SansMono400 text-black text-sm
+            flex items-center justify-between font-inter   text-black text-sm
             ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#ffe54d] cursor-pointer'}
             transition-colors duration-200 min-h-[40px] min-w-[200px] max-w-[250px]
           `}
         >
-          <span className="truncate">{getDisplayValue()}</span>
+          <span className="truncate font-inter">{getDisplayValue()}</span>
           <BsChevronDown 
             className={`ml-2 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
             size={12} 
@@ -104,7 +104,7 @@ export default function CollectionsDropdown({
           <div className="absolute top-full left-0 mt-1 bg-white border border-black rounded-lg shadow-lg z-50 min-w-[200px] max-w-[250px]">
             <div className="py-1 max-h-[200px] overflow-y-auto scrollbar-hide">
               {collections.length === 0 ? (
-                <div className="px-4 py-2 text-sm text-gray-500 font-SansMono400">
+                <div className="px-4 py-2 text-sm text-gray-500 font-inter">
                   No collections yet
                 </div>
               ) : (
@@ -114,7 +114,7 @@ export default function CollectionsDropdown({
                     type="button"
                     onClick={() => handleSelect(collection.name)}
                     className={`
-                      w-full text-left px-4 py-2 text-sm font-SansMono400 
+                      w-full text-left px-4 py-2 text-sm font-inter 
                       hover:bg-gray-100 transition-colors duration-150
                       ${selectedCollection === collection.name ? 'bg-[#ffea67]' : ''}
                       min-h-[40px] flex items-center
