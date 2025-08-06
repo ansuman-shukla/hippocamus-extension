@@ -23,6 +23,7 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
   const [currentTab, setCurrentTab] = useState("submit");
   const [extraNote, setExtraNote] = useState("");
   const [NotesTitle, setNotesTitle] = useState("");
+  const [selectedCollection, setSelectedCollection] = useState("");
 
   const Navigate = useNavigate();
   const [DoneNumber, setDoneNumber] = useState(0);
@@ -87,8 +88,20 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
 
       try {
         if (currentTab === "submit") {
-          console.log("Frontend submitting link data:", formData);
-          const response = await submitLink(formData);
+          // For bookmarks, append collection to note field if selected from dropdown
+          let finalFormData = { ...formData };
+          if (selectedCollection) {
+            // Check if note already contains @collection pattern
+            const existingCollection = formData.note.match(/@([a-zA-Z0-9_-]+)/);
+            if (!existingCollection) {
+              // Add selected collection to note field if no @collection pattern exists
+              finalFormData.note = formData.note ? `@${selectedCollection} ${formData.note}` : `@${selectedCollection}`;
+            }
+            // If @collection already exists in note, prioritize that over dropdown selection
+          }
+          
+          console.log("Frontend submitting link data:", finalFormData);
+          const response = await submitLink(finalFormData);
           console.log("Frontend received link response:", response);
           
           setIsLoading(false);
@@ -98,10 +111,27 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
           setRtBtnTxt("HOME")
           setShowOnlyOne(true)
         } else {
+          // For notes, use both collection field and note field
+          let finalNote = extraNote;
+          let collectionForAPI = selectedCollection;
+          
+          // Check if note contains @collection pattern
+          const noteCollectionMatch = extraNote.match(/@([a-zA-Z0-9_-]+)/);
+          if (noteCollectionMatch) {
+            // If @collection exists in note, use that as priority
+            collectionForAPI = noteCollectionMatch[1];
+          } else if (selectedCollection) {
+            // If no @collection in note but dropdown has selection, add it to note for consistency
+            finalNote = `@${selectedCollection} ${extraNote}`;
+            collectionForAPI = selectedCollection;
+          }
+          
           const noteData = {
             title: NotesTitle,
-            note: extraNote
+            note: finalNote,
+            collection: collectionForAPI || undefined
           };
+          
           console.log("Frontend submitting note data:", noteData);
           const response = await saveNotes(noteData);
           console.log("Frontend received note response:", response);
@@ -130,6 +160,9 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
     if (isNavigating.current) {
       return;
     }
+    
+    // Reset selected collection when clearing form
+    setSelectedCollection("");
     
     if (showOnlyOne && leftBtnTxt == "CLOSE") {
       chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -187,6 +220,8 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
           setExtraNote={setExtraNote}
           NotesTitle={NotesTitle}
           setNotesTitle={setNotesTitle}
+          selectedCollection={selectedCollection}
+          setSelectedCollection={setSelectedCollection}
         />
         
       </div>

@@ -263,5 +263,10 @@ export const getQuotes = async () => {
   return api.get('/quotes/');
 };
 
+export const getCollections = async () => {
+  console.log('📚 API CLIENT: Fetching user collections');
+  return api.get('/collections/');
+};
+
 // Export the main client
 export default api;

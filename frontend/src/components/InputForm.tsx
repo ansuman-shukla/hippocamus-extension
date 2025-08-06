@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useRef } from "react";
 import Button from "./Button";
 import LoaderPillars from "./LoaderPillars";
-import { BsChevronDoubleDown } from "react-icons/bs";
+import CollectionsDropdown from "./CollectionsDropdown";
 
 interface Props {
   handleSubmit: any,
@@ -20,6 +20,8 @@ interface Props {
   setExtraNote: (note: string) => void;
   NotesTitle: string;
   setNotesTitle: (title: string) => void;
+  selectedCollection: string;
+  setSelectedCollection: (collection: string) => void;
 }
 interface FormData {
   link: string;
@@ -42,9 +44,11 @@ export default function InputForm({
   setExtraNote,
   NotesTitle,
   setNotesTitle,
-  setCurrentTab
+  setCurrentTab,
+  selectedCollection,
+  setSelectedCollection
 }: Props) {
-  const [showNotes, setShowNotes] = useState(false);
+  const showNotes = false; // Fixed to always show bookmarks form
   const notesTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const titleTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const bookmarkNoteRef = useRef<HTMLTextAreaElement>(null);
@@ -84,6 +88,12 @@ export default function InputForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {/* Collections Dropdown - Always shown at top */}
+      <CollectionsDropdown 
+        selectedCollection={selectedCollection}
+        onSelectionChange={setSelectedCollection}
+        isDisabled={isLoading}
+      />
       {!showNotes ? (<div
         className={`form-input-div space-y-4 transition-all duration-500 ${
           showNotes ? "opacity-0 pointer-events-none " : "opacity-100"
@@ -175,18 +185,7 @@ export default function InputForm({
         />
       </div>)}
 
-        <div className="flex justify-center mt-0">
-          {!showOnlyOne && !Error && (
-            <button
-              type="button"
-              className="text-neutral-700 bg-white/20 rounded-full px-4 py-2 flex justify-center items-center gap-1 mt-2  text-sm transition hover:text-black"
-              onClick={() => setShowNotes(!showNotes)}
-              disabled={isLoading || showOnlyOne}
-            >
-              <BsChevronDoubleDown size={12} /> { showNotes ? "Add Bookmarks" : "Add Notes"}
-            </button>
-          )}
-        </div>
+
 
       {Error ? (
         <div className="pb-0 mb-0 space-y-0">

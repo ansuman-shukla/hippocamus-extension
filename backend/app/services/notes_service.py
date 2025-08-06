@@ -42,8 +42,18 @@ async def create_note(note: dict, namespace: str):
     doc_id = f"{namespace}-{timestamp}"
 
     try:
-        # Extract collection from note field
-        collection = extract_collection_from_text(note.note) or "general"
+        # Prioritize collection field from schema, then extract from note field, default to "general"
+        collection = None
+        if hasattr(note, 'collection') and note.collection:
+            collection = note.collection.lower().strip()
+            logger.info(f"📚 COLLECTIONS: Using collection from API field: '{collection}'")
+        else:
+            collection = extract_collection_from_text(note.note)
+            if collection:
+                logger.info(f"📚 COLLECTIONS: Extracted collection from note text: '{collection}'")
+        
+        # Default to "general" if no collection specified
+        collection = collection or "general"
         
         # Clean the note text for embedding (remove collection pattern)
         clean_note = remove_collection_pattern_from_text(note.note) if note.note else note.note
