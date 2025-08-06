@@ -9,7 +9,7 @@ from langchain_core.documents import Document
 from app.models.notesModel import *
 from app.utils.collection_extractor import extract_collection_from_text, remove_collection_pattern_from_text
 from app.services.pinecone_service import *
-from app.services.user_collections_service import add_collection_to_user
+from app.services.user_collections_service import increment_memory_count
 
 async def get_all_notes_from_db(user_id: str):
     """
@@ -83,14 +83,14 @@ async def create_note(note: dict, namespace: str):
 
         await save_note_to_db(metadata)
         
-        # Track collection in user_collections table if collection was extracted
+        # Track collection and increment memory count if collection was extracted
         if collection and collection != "general":
             try:
-                logger.info(f"📚 COLLECTIONS: Tracking collection '{collection}' for user {namespace}")
-                await add_collection_to_user(namespace, collection)
-                logger.info(f"📚 COLLECTIONS: Successfully tracked collection '{collection}' for user {namespace}")
+                logger.info(f"📚 COLLECTIONS: Incrementing memory count for collection '{collection}' for user {namespace}")
+                await increment_memory_count(namespace, collection)
+                logger.info(f"📚 COLLECTIONS: Successfully incremented memory count for collection '{collection}' for user {namespace}")
             except Exception as e:
-                logger.warning(f"📚 COLLECTIONS: Failed to track collection '{collection}' for user {namespace}: {str(e)}")
+                logger.warning(f"📚 COLLECTIONS: Failed to increment memory count for collection '{collection}' for user {namespace}: {str(e)}")
                 # Don't fail the entire save operation if collection tracking fails
                 pass
 

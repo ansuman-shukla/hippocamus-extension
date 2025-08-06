@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Request
-from typing import List
+from typing import List, Dict, Any
 from app.services.user_collections_service import get_user_collections
 from app.core.rate_limiter import limiter
 from app.exceptions.global_exceptions import DatabaseConnectionError
@@ -12,14 +12,14 @@ router = APIRouter(
     tags=["Collections"]
 )
 
-@router.get("/", response_model=List[str])
+@router.get("/", response_model=List[Dict[str, Any]])
 @limiter.limit("30/minute")
 async def get_user_collections_endpoint(request: Request):
     """
-    Get all collections for the authenticated user.
+    Get all collections with memory counts for the authenticated user.
     
     Returns:
-        List[str]: Array of collection names for the user
+        List[Dict]: Array of collection objects with 'name' and 'memory_count' fields
     """
     try:
         # Get user ID from request state (set by middleware)

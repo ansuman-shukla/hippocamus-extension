@@ -50,6 +50,7 @@ async def add_collection_to_user(user_id: str, collection_name: str) -> bool:
     """
     Add a collection to a user's collections array if it doesn't already exist.
     Returns True if collection was added, False if it already existed.
+    This function only creates the collection - use increment_memory_count to add memories.
     """
     try:
         logger.info(f"📚 COLLECTIONS: Adding collection '{collection_name}' to user {user_id}")
@@ -57,19 +58,24 @@ async def add_collection_to_user(user_id: str, collection_name: str) -> bool:
         # Ensure user document exists
         await ensure_user_collection_exists(user_id)
         
-        # Check if collection already exists in user's array
-        existing_doc = await safe_collection_user_collections.find_one(
-            {"userId": user_id, "collections": collection_name}
-        )
+        # Check if collection already exists in user's array (handle both old and new formats)
+        existing_doc = await safe_collection_user_collections.find_one({
+            "userId": user_id,
+            "$or": [
+                {"collections": collection_name},  # Old format (string)
+                {"collections.name": collection_name}  # New format (object)
+            ]
+        })
         
         if existing_doc:
             logger.info(f"📚 COLLECTIONS: Collection '{collection_name}' already exists for user {user_id}")
             return False
         
-        # Add collection to user's array
+        # Add collection as object with memory_count 0
+        collection_obj = {"name": collection_name, "memory_count": 0}
         result = await safe_collection_user_collections.update_one(
             {"userId": user_id},
-            {"$addToSet": {"collections": collection_name}}
+            {"$addToSet": {"collections": collection_obj}}
         )
         
         if result.modified_count > 0:
@@ -89,9 +95,74 @@ async def add_collection_to_user(user_id: str, collection_name: str) -> bool:
         logger.error(f"Unexpected error adding collection to user: {str(e)}", exc_info=True)
         raise Exception(f"Error adding collection to user: {str(e)}")
 
-async def get_user_collections(user_id: str) -> List[str]:
+async def increment_memory_count(user_id: str, collection_name: str) -> bool:
     """
-    Get list of all collections for a specific user.
+    Increment the memory count for a specific collection.
+    Creates the collection if it doesn't exist.
+    Returns True if count was incremented successfully.
+    """
+    try:
+        logger.info(f"📚 COLLECTIONS: Incrementing memory count for collection '{collection_name}' for user {user_id}")
+        
+        # Ensure user document exists
+        await ensure_user_collection_exists(user_id)
+        
+        # First, try to increment if collection exists in new format
+        result = await safe_collection_user_collections.update_one(
+            {"userId": user_id, "collections.name": collection_name},
+            {"$inc": {"collections.$.memory_count": 1}}
+        )
+        
+        if result.modified_count > 0:
+            logger.info(f"📚 COLLECTIONS: Successfully incremented memory count for collection '{collection_name}' for user {user_id}")
+            return True
+        
+        # Check if collection exists in old format (string) and convert it
+        existing_doc = await safe_collection_user_collections.find_one({
+            "userId": user_id,
+            "collections": collection_name
+        })
+        
+        if existing_doc:
+            # Remove old string format and add new object format with count 1
+            await safe_collection_user_collections.update_one(
+                {"userId": user_id},
+                {
+                    "$pull": {"collections": collection_name},
+                    "$addToSet": {"collections": {"name": collection_name, "memory_count": 1}}
+                }
+            )
+            logger.info(f"📚 COLLECTIONS: Converted and incremented collection '{collection_name}' from old format for user {user_id}")
+            return True
+        
+        # Collection doesn't exist, create it with count 1
+        collection_obj = {"name": collection_name, "memory_count": 1}
+        result = await safe_collection_user_collections.update_one(
+            {"userId": user_id},
+            {"$addToSet": {"collections": collection_obj}}
+        )
+        
+        if result.modified_count > 0:
+            logger.info(f"📚 COLLECTIONS: Created new collection '{collection_name}' with memory count 1 for user {user_id}")
+            return True
+        else:
+            logger.warning(f"📚 COLLECTIONS: Failed to create or increment collection '{collection_name}' for user {user_id}")
+            return False
+            
+    except DatabaseConnectionError as e:
+        logger.error(f"Database connection error: {str(e)}")
+        raise
+    except PyMongoError as e:
+        logger.error(f"Database error incrementing memory count: {str(e)}")
+        raise Exception(f"Database error: {str(e)}")
+    except Exception as e:
+        logger.error(f"Unexpected error incrementing memory count: {str(e)}", exc_info=True)
+        raise Exception(f"Error incrementing memory count: {str(e)}")
+
+async def get_user_collections(user_id: str) -> List[dict]:
+    """
+    Get list of all collections with their memory counts for a specific user.
+    Returns list of objects with 'name' and 'memory_count' fields.
     """
     try:
         logger.info(f"📚 COLLECTIONS: Retrieving collections for user {user_id}")
@@ -106,8 +177,11 @@ async def get_user_collections(user_id: str) -> List[str]:
             logger.warning(f"📚 COLLECTIONS: No collections document found for user {user_id}")
             return []
         
-        collections = user_doc.get("collections", [])
-        logger.info(f"📚 COLLECTIONS: Retrieved {len(collections)} collections for user {user_id}: {collections}")
+        # Use the model formatter to handle both old and new formats
+        formatted_data = user_collections_model(user_doc)
+        collections = formatted_data.get("collections", [])
+        
+        logger.info(f"📚 COLLECTIONS: Retrieved {len(collections)} collections for user {user_id}")
         
         return collections
         
