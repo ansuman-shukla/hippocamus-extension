@@ -149,8 +149,9 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
         setbgClr("--primary-orange")
         setLftBtnTxt(currentTab === "submit" ? "Home" : "BACK")
         setBtnTxtClr("--primary-orange")
-        setRtBtnTxt("RETRY :)")
-        setisError(error?.message || "API Error")
+        setRtBtnTxt("RETRY")
+        // Don't set showOnlyOne to true - keep form visible
+        setisError("Some error occurred, Please retry..")
       }
     }
   }

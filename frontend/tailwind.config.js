@@ -13,6 +13,7 @@ export default {
         SansText400:['Sans-Text-400','sans-serif'],
         SansText700:['Sans-Text-700','sans-serif'],
         NanumMyeongjo:['Nanum Myeongjo','sans-serif'],
+        rubik:['Rubik','sans-serif'],
       },
       colors: {
         // Greens

@@ -88,14 +88,32 @@ export default function InputForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
-      {/* Collections Dropdown - Always shown at top */}
-      <CollectionsDropdown 
-        selectedCollection={selectedCollection}
-        onSelectionChange={setSelectedCollection}
-        isDisabled={isLoading}
-      />
+      {/* Error Message at Top */}
+      {Error && (
+        <div className="text-center space-y-2 py-4 mb-4">
+          <h2 className="text-2xl font-bold text-black font-rubik">Error!</h2>
+          <p className="text-lg text-black font-rubik">{Error}</p>
+        </div>
+      )}
+      
+      {/* Collections Dropdown - Hidden when there's an error or success */}
+      {!Error && leftBtnTxt !== "CLOSE" && (
+        <CollectionsDropdown 
+          selectedCollection={selectedCollection}
+          onSelectionChange={setSelectedCollection}
+          isDisabled={isLoading}
+        />
+      )}
+      
+      {/* Success Message at Top */}
+      {!Error && leftBtnTxt === "CLOSE" && (
+        <div className="text-center space-y-2 py-4 mb-4">
+          <h2 className="text-2xl font-bold text-black font-rubik">Successful!</h2>
+          <p className="text-lg text-black font-rubik">Your entry has been saved.</p>
+        </div>
+      )}
       {!showNotes ? (<div
-        className={`form-input-div space-y-3 transition-all duration-500 mt-6 ${
+        className={`form-input-div space-y-3 transition-all duration-500 ${Error || leftBtnTxt === "CLOSE" ? 'mt-2' : 'mt-6'} ${
           showNotes ? "opacity-0 pointer-events-none " : "opacity-100"
         }`}
       >
@@ -109,7 +127,7 @@ export default function InputForm({
             onChange={handleChange}
             className="w-full border-b border-black bg-transparent focus:outline-none  pb-1 placeholder-[#151515] text-[16px] placeholder-opacity-25"
             placeholder="Your link here"
-            disabled={isLoading || showOnlyOne}
+            disabled={isLoading || leftBtnTxt === "CLOSE"}
           />
         </div>
 
@@ -122,7 +140,7 @@ export default function InputForm({
             onChange={handleChange}
             className="w-full border-b text-[16px] border-black bg-transparent focus:outline-none pb-1 placeholder-[#151515] placeholder-opacity-25"
             placeholder="Your title here"
-            disabled={isLoading || showOnlyOne}
+            disabled={isLoading || leftBtnTxt === "CLOSE"}
           />
         </div>
 
@@ -144,7 +162,7 @@ export default function InputForm({
             }}
             className="w-full text-[15px] border-b border-black bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-1 scrollbar-hide"
             placeholder="Add micro-note for better search results (press Enter to save)"
-            disabled={isLoading || showOnlyOne}
+            disabled={isLoading || leftBtnTxt === "CLOSE"}
           />
         </div>
 
@@ -187,13 +205,9 @@ export default function InputForm({
 
 
 
-      {Error ? (
-        <div className="pb-0 mb-0 space-y-0">
-          <p className="text-red-500 font-SansMono400 text-sm text-center pb-0">{Error}</p>
-        </div>
-      ) : null}
 
-      <div className={`flex ${showOnlyOne ? 'justify-center' : 'justify-between'} mx-auto ${Error ? "pt-4" : "pt-8"}`} style={{ marginTop: '6px' }}>
+
+      <div className={`flex ${leftBtnTxt === "CLOSE" ? 'justify-center' : 'justify-between'} mx-auto ${Error || leftBtnTxt === "CLOSE" ? "pt-4" : "pt-8"}`} style={{ marginTop: '6px' }}>
         {isLoading ? (
           <div className="flex justify-center w-full">
             <LoaderPillars />
@@ -201,7 +215,7 @@ export default function InputForm({
         ) : (
           <>
             <Button handle={handleClear} text={leftBtnTxt} textColor={BtnTxtClr} iSdisabled={false} />
-            {showOnlyOne ? null : <Button handle={handleSubmit} text={rightBtnTxt} textColor={BtnTxtClr} IncMinWidth="129px" iSdisabled={false} />}
+            {leftBtnTxt === "CLOSE" ? null : <Button handle={handleSubmit} text={rightBtnTxt} textColor={BtnTxtClr} IncMinWidth="129px" iSdisabled={false} />}
           </>
         )}
       </div>
