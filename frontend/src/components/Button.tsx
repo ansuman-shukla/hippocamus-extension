@@ -17,7 +17,7 @@ interface Props {
         style={{color:`var(${textColor})`, minWidth: IncMinWidth ? `${IncMinWidth}`: '118px'}}
         className={`bg-black px-6 py-3 rounded-full 
                     hover:bg-transparent hover:text-black transition-colors
-                    inter-500 text-xs border border-black tracking-wider`}
+                    inter-500 text-button border border-black tracking-wider`}
         onMouseEnter={(e) => (e.currentTarget.style.color = "black")}
         onMouseLeave={(e) => (e.currentTarget.style.color = `var(${textColor})`)}
         disabled={iSdisabled}

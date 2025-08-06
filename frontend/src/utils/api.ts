@@ -87,25 +87,47 @@ export async function fetchWithAutoRefresh(url: string, options: RequestInit = {
 export async function checkAuthStatus() {
     const tokens = await chrome.storage.local.get(["access_token", "refresh_token"]);
     
+    // If no access token, return structured response indicating no tokens
     if (!tokens.access_token) {
-        throw new Error("No access token found");
+        console.log('🔍 checkAuthStatus: No access token found in storage');
+        return {
+            has_access_token: false,
+            has_refresh_token: !!tokens.refresh_token,
+            is_authenticated: false,
+            user_id: null,
+            token_valid: false
+        };
     }
 
-    const response = await fetch(`${API_BASE_URL}/auth/status`, {
-        method: 'GET',
-        credentials: 'include',
-        headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${tokens.access_token}`
-        }
-    });
+    try {
+        const response = await fetch(`${API_BASE_URL}/auth/status`, {
+            method: 'GET',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${tokens.access_token}`
+            }
+        });
 
-    if (!response.ok) {
-        console.log('🔍 checkAuthStatus: Backend returned non-OK status:', response.status);
-        throw new Error(`Auth status check failed: ${response.status}`);
+        const data = await response.json();
+        
+        // Add frontend refresh token info since backend doesn't receive it
+        data.has_refresh_token = !!tokens.refresh_token;
+        
+        console.log('🔍 checkAuthStatus: Response received:', response.status);
+        return data;
+        
+    } catch (error: any) {
+        console.log('🔍 checkAuthStatus: Network error:', error.message);
+        return {
+            has_access_token: true,
+            has_refresh_token: !!tokens.refresh_token,
+            is_authenticated: false,
+            user_id: null,
+            token_valid: false,
+            network_error: true
+        };
     }
-    
-    return response.json();
 }
 
 

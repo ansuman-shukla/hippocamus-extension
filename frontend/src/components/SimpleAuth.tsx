@@ -75,19 +75,8 @@ export function useSimpleAuth() {
       console.log('🔍 Checking if user is already logged in...');
       
       try {
-        const tokens = await chrome.storage.local.get(["access_token", "refresh_token"]);
-        
-        if (!tokens.access_token) {
-          console.log('❌ No access token found');
-          setUser(null);
-          setLoading(false);
-          return;
-        }
-        
-        // Check auth status with backend
         const authStatus = await checkAuthStatus();
         console.log('🔍 Auth status response:', authStatus);
-        console.log('🔍 Auth status - is_authenticated:', authStatus.is_authenticated, 'token_valid:', authStatus.token_valid);
         
         if (authStatus.is_authenticated && authStatus.token_valid) {
           console.log('✅ User is authenticated and token is valid');
@@ -99,51 +88,44 @@ export function useSimpleAuth() {
             profile_pic: authStatus.picture || authStatus.user_picture
           };
           setUser(profile);
-        } else if (authStatus.has_access_token === false && authStatus.has_refresh_token === false) {
-          console.log('❌ No tokens on backend, need to re-authenticate');
-          // Clear local tokens and redirect to auth
-          await chrome.storage.local.remove(['access_token', 'refresh_token']);
-          setUser(null);
-        } else {
-          console.log('❌ Token invalid or user not authenticated. Checking if we can refresh...');
-          console.log('🔄 Refresh token available:', !!tokens.refresh_token);
-          // Try to refresh token if we have a refresh token
-          if (tokens.refresh_token) {
-            console.log('🔄 Starting token refresh process...');
-            try {
-              console.log('🔄 Calling refreshTokens function...');
-              await refreshTokens(tokens.refresh_token);
-              console.log('✅ Token refresh completed successfully');
-              // After refresh, try checking auth status again
-              console.log('🔄 Rechecking auth status after token refresh...');
-              const newAuthStatus = await checkAuthStatus();
-              console.log('🔄 New auth status:', newAuthStatus.is_authenticated);
-              if (newAuthStatus.is_authenticated) {
-                const profile = {
-                  id: newAuthStatus.user_id,
-                  sub: newAuthStatus.user_id,
-                  email: newAuthStatus.user_email,
-                  full_name: newAuthStatus.full_name || newAuthStatus.user_name,
-                  profile_pic: newAuthStatus.picture || newAuthStatus.user_picture
-                };
-                setUser(profile);
-              } else {
-                setUser(null);
-              }
-            } catch (refreshError: any) {
-              console.log('❌ Token refresh failed:', refreshError.message);
-              await chrome.storage.local.remove(['access_token', 'refresh_token']);
+          
+        } else if (!authStatus.token_valid && authStatus.has_refresh_token) {
+          console.log('🔄 Token is invalid, but a refresh token is available. Attempting to refresh...');
+          try {
+            await refreshTokens( (await chrome.storage.local.get("refresh_token")).refresh_token );
+            const newAuthStatus = await checkAuthStatus();
+            
+            if (newAuthStatus.is_authenticated) {
+              console.log('✅ Refresh successful, user is now authenticated');
+              const profile = {
+                id: newAuthStatus.user_id,
+                sub: newAuthStatus.user_id,
+                email: newAuthStatus.user_email,
+                full_name: newAuthStatus.full_name || newAuthStatus.user_name,
+                profile_pic: newAuthStatus.picture || newAuthStatus.user_picture
+              };
+              setUser(profile);
+            } else {
+              console.log('❌ Refresh was attempted, but user is still not authenticated. Logging out.');
+              await chrome.storage.local.remove(["access_token", "refresh_token"]);
               setUser(null);
             }
-          } else {
-            console.log('❌ No refresh token available, setting user to null');
+          } catch (refreshError: any) {
+            console.log('❌ Token refresh failed:', refreshError.message);
+            await chrome.storage.local.remove(["access_token", "refresh_token"]);
             setUser(null);
           }
+          
+        } else {
+          console.log('❌ No valid session. Tokens will be cleared.');
+          await chrome.storage.local.remove(["access_token", "refresh_token"]);
+          setUser(null);
         }
+        
       } catch (e: any) {
         console.log('❌ Auth check failed (outer catch):', e.message);
-        console.log('❌ This means checkAuthStatus threw an error, not the backend response');
         setUser(null);
+        
       } finally {
         setLoading(false);
       }

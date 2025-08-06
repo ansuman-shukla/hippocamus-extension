@@ -75,7 +75,7 @@ async def authorisation_middleware(request: Request, call_next):
     logger.info(f"Incoming request: {request.method} {request.url.path}")
 
     # Skip auth for some public endpoints
-    if request.url.path in ["/health", "/health/detailed"] or request.url.path.startswith("/quotes"):
+    if request.url.path in ["/health", "/health/detailed"] or request.url.path.startswith("/quotes") or request.url.path.startswith("/auth"):
         return await call_next(request)
 
     try:
