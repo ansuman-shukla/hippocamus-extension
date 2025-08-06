@@ -118,7 +118,7 @@ export default function InputForm({
         }`}
       >
         <div className="space-y-2">
-          <label className="block text-[18px] font-semibold font-rubik">Link:</label>
+          <label className="block text-[18px] style={{fontWeight: 420}} font-rubik">Link:</label>
           <input
             type="text"
             name="link"
@@ -132,7 +132,7 @@ export default function InputForm({
         </div>
 
         <div className="space-y-2">
-          <label className="block text-[18px] font-semibold font-rubik">Title:</label>
+          <label className="block text-[18px] style={{fontWeight: 420}} font-rubik">Title:</label>
           <input
             type="text"
             name="title"
@@ -145,7 +145,7 @@ export default function InputForm({
         </div>
 
         <div className="space-y-2">
-          <label className="block text-[18px] font-semibold font-rubik">Note:</label>
+          <label className="block text-[18px] style={{fontWeight: 420}} font-rubik">Note:</label>
           <textarea
             ref={bookmarkNoteRef}
             name="note"

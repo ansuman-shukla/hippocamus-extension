@@ -75,7 +75,7 @@ export default function CollectionsDropdown({
   return (
     <div className="space-y-1">
       {/* "SAVING IN" Label */}
-      <label className="block text-[18px] font-semibold uppercase tracking-wide text-black">
+      <label className="block text-[18px] uppercase tracking-wide text-black" style={{fontWeight: 600}}>
         SAVING IN
       </label>
       
