@@ -80,16 +80,16 @@ export default function CollectionsDropdown({
       </label>
       
       {/* Collections Dropdown */}
-      <div className="relative">
+      <div className="relative w-fit max-w-[250px]">
         <button
           type="button"
           onClick={() => !isDisabled && !isLoading && setIsOpen(!isOpen)}
           disabled={isDisabled || isLoading}
           className={`
-            w-full bg-[#ffea67] border border-black rounded-full px-4 py-2.5 
+            bg-[#ffea67] border border-black rounded-full px-4 py-2.5 
             flex items-center justify-between font-SansMono400 text-black text-sm
             ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#ffe54d] cursor-pointer'}
-            transition-colors duration-200 min-h-[40px]
+            transition-colors duration-200 min-h-[40px] min-w-[200px] max-w-[250px]
           `}
         >
           <span className="truncate">{getDisplayValue()}</span>
@@ -101,7 +101,7 @@ export default function CollectionsDropdown({
 
         {/* Dropdown Menu */}
         {isOpen && !isLoading && (
-          <div className="absolute top-full left-0 right-0 mt-1 bg-white border border-black rounded-lg shadow-lg z-50">
+          <div className="absolute top-full left-0 mt-1 bg-white border border-black rounded-lg shadow-lg z-50 min-w-[200px] max-w-[250px]">
             <div className="py-1 max-h-[200px] overflow-y-auto scrollbar-hide">
               {collections.length === 0 ? (
                 <div className="px-4 py-2 text-sm text-gray-500 font-SansMono400">
