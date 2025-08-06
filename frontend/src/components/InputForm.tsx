@@ -95,39 +95,39 @@ export default function InputForm({
         isDisabled={isLoading}
       />
       {!showNotes ? (<div
-        className={`form-input-div space-y-4 transition-all duration-500 ${
+        className={`form-input-div space-y-3 transition-all duration-500 mt-6 ${
           showNotes ? "opacity-0 pointer-events-none " : "opacity-100"
         }`}
       >
-        <div className="space-y-1">
-          <label className="block text-sm font-SansMono400">Link:</label>
+        <div className="space-y-2">
+          <label className="block text-[18px] font-semibold font-rubik">Link:</label>
           <input
             type="text"
             name="link"
             autoComplete="off"
             value={formData.link}
             onChange={handleChange}
-            className="w-full border-b border-black bg-transparent focus:outline-none  pb-1 placeholder-[#151515] placeholder-opacity-25"
+            className="w-full border-b border-black bg-transparent focus:outline-none  pb-1 placeholder-[#151515] text-[16px] placeholder-opacity-25"
             placeholder="Your link here"
             disabled={isLoading || showOnlyOne}
           />
         </div>
 
-        <div className="space-y-1">
-          <label className="block text-sm font-SansMono400">Title:</label>
+        <div className="space-y-2">
+          <label className="block text-[18px] font-semibold font-rubik">Title:</label>
           <input
             type="text"
             name="title"
             value={formData.title}
             onChange={handleChange}
-            className="w-full border-b border-black bg-transparent focus:outline-none pb-1 placeholder-[#151515] placeholder-opacity-25"
+            className="w-full border-b text-[16px] border-black bg-transparent focus:outline-none pb-1 placeholder-[#151515] placeholder-opacity-25"
             placeholder="Your title here"
             disabled={isLoading || showOnlyOne}
           />
         </div>
 
-        <div className="space-y-1">
-          <label className="block text-sm font-SansMono400">Note:</label>
+        <div className="space-y-2">
+          <label className="block text-[18px] font-semibold font-rubik">Note:</label>
           <textarea
             ref={bookmarkNoteRef}
             name="note"
@@ -142,7 +142,7 @@ export default function InputForm({
                 }
               }
             }}
-            className="w-full border-b border-black bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-1 scrollbar-hide"
+            className="w-full text-[16px] border-b border-black bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-1 scrollbar-hide"
             placeholder="Add micro-note for better search results (press Enter to save)"
             disabled={isLoading || showOnlyOne}
           />
@@ -155,7 +155,7 @@ export default function InputForm({
           showNotes ? "opacity-100 translate-y-0 z-10" : "opacity-0 pointer-events-none -translate-y-10"
         }`}
       >
-        <label className="block text-md font-SansMono400 text-[15px] ">Title:</label>
+        <label className="block text-md font-SansMono400 text-[18px] ">Title:</label>
         <textarea
           ref={titleTextAreaRef}
           rows={1}
@@ -165,7 +165,7 @@ export default function InputForm({
           placeholder="Your title here..."
           disabled={isLoading || showOnlyOne}
         />
-        <label className="block text-md font-SansMono400 text-[15px] ">Note:</label>
+        <label className="block text-md font-SansMono400 text-[18px] ">Note:</label>
         <textarea
           ref={notesTextAreaRef}
           rows={2}
@@ -193,7 +193,7 @@ export default function InputForm({
         </div>
       ) : null}
 
-      <div className={`flex ${showOnlyOne ? 'justify-center' : 'justify-between'} mx-auto ${Error ? "pt-0" : "pt-1"}`}>
+      <div className={`flex ${showOnlyOne ? 'justify-center' : 'justify-between'} mx-auto mt-2 ${Error ? "pt-4" : "pt-8"}`}>
         {isLoading ? (
           <div className="flex justify-center w-full">
             <LoaderPillars />
