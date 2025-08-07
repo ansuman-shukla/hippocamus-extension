@@ -21,6 +21,10 @@ export default function CollectionsDropdown({
   const [collections, setCollections] = useState<Collection[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Sizing for smooth list animation (panel opens below the fixed button)
+  const ITEM_HEIGHT = 40; // px per row
+  const MAX_VISIBLE_ITEMS = 5;
 
   // Fetch collections from API
   useEffect(() => {
@@ -80,56 +84,65 @@ export default function CollectionsDropdown({
         SAVING IN
       </label>
       
-      {/* Collections Dropdown */}
+      {/* Collections Dropdown (fixed button, panel expands downward) */}
       <div className="relative w-fit max-w-[250px]">
+        {/* Button remains fixed */}
         <button
           type="button"
           onClick={() => !isDisabled && !isLoading && setIsOpen(!isOpen)}
           disabled={isDisabled || isLoading}
+          aria-expanded={isOpen}
           className={`
-            bg-[#ffea67] ${isOpen ? 'border-[3px]' : 'border'} border-black rounded-full px-4 py-2.5 
-            flex items-center justify-between font-inter   text-black text-sm
-            ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#ffe54d] hover:border-[3px] cursor-pointer'}
-            transition-all duration-200 min-h-[40px] min-w-[200px] max-w-[250px]
+            bg-[#ffea67] ${isOpen ? 'border-[3px] border-b-0 rounded-t-3xl' : 'border rounded-full'}
+            border-black px-4 h-11 min-w-[200px] max-w-[250px]
+            flex items-center justify-between text-black text-sm font-inter
+            ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#ffe54d] cursor-pointer'}
+            transition-colors duration-200
           `}
         >
-          <span className="truncate font-inter">{getDisplayValue()}</span>
-          <BsChevronDown 
-            className={`ml-2 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`} 
-            size={12} 
+          <span className="truncate">{getDisplayValue()}</span>
+          <BsChevronDown
+            className={`ml-2 transition-transform duration-200 ${isOpen ? 'rotate-180' : ''}`}
+            size={12}
           />
         </button>
 
-        {/* Dropdown Menu */}
-        {isOpen && !isLoading && (
-          <div className="absolute top-full left-0 mt-1 bg-white border border-black rounded-lg shadow-lg z-50 min-w-[200px] max-w-[250px]">
-            <div className="py-1 max-h-[200px] overflow-y-auto scrollbar-hide">
-              {collections.length === 0 ? (
-                <div className="px-4 py-2 text-sm text-gray-500 font-inter">
-                  No collections yet
-                </div>
-              ) : (
-                collections.map((collection) => (
-                  <button
-                    key={collection.name}
-                    type="button"
-                    onClick={() => handleSelect(collection.name)}
-                    className={`
-                      w-full text-left px-4 py-2 text-sm font-inter 
-                      hover:bg-gray-100 transition-colors duration-150
-                      ${selectedCollection === collection.name ? 'bg-[#ffea67]' : ''}
-                      min-h-[40px] flex items-center
-                    `}
-                  >
-                    <div className="flex justify-between items-center w-full">
-                      <span className="truncate">{collection.name}</span>
-                      <span className="text-xs text-gray-500 ml-2">
-                        {collection.memory_count}
-                      </span>
-                    </div>
-                  </button>
-                ))
-              )}
+        {/* Drop panel attaches to bottom of button with no gap */}
+        {!isLoading && (
+          <div
+            className={`absolute left-0 top-full w-full z-50 ${isOpen ? 'pointer-events-auto' : 'pointer-events-none'}`}
+          >
+            <div
+              className={`
+                ${isOpen ? 'border-[3px] border-t-0' : 'border-0'} border-black rounded-b-3xl overflow-hidden
+                bg-[#ffea67]
+                transition-[max-height] duration-300 ease-out
+              `}
+              style={{ maxHeight: isOpen ? `${Math.min(MAX_VISIBLE_ITEMS, collections.length) * ITEM_HEIGHT}px` : '0px' }}
+            >
+              <div className="max-h-[200px] overflow-y-auto scrollbar-hide">
+                {collections.length === 0 ? (
+                  <div className="px-4 py-2 text-sm text-black/70">No collections yet</div>
+                ) : (
+                  collections.map((collection) => (
+                    <button
+                      key={collection.name}
+                      type="button"
+                      onClick={() => handleSelect(collection.name)}
+                      className={`
+                        w-full text-left px-4 h-10 text-sm flex items-center transition-colors duration-150
+                        hover:bg-black/10
+                        ${selectedCollection === collection.name ? 'bg-black/10 font-medium' : ''}
+                      `}
+                    >
+                      <div className="flex justify-between items-center w-full">
+                        <span className="truncate">{collection.name}</span>
+                        <span className="text-xs text-black/60 ml-2">{collection.memory_count}</span>
+                      </div>
+                    </button>
+                  ))
+                )}
+              </div>
             </div>
           </div>
         )}
