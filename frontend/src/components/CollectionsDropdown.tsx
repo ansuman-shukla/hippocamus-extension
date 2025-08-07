@@ -32,12 +32,13 @@ export default function CollectionsDropdown({
         const collectionsData: Collection[] = await getCollections();
         console.log('📚 COLLECTIONS DROPDOWN: Fetched collections:', collectionsData);
         
-        // Collections are already sorted by memory_count (descending) from backend
-        setCollections(collectionsData);
+        // Sort collections by memory_count in descending order
+        const sortedCollections = collectionsData.sort((a, b) => b.memory_count - a.memory_count);
+        setCollections(sortedCollections);
         
-        // Set default selection to highest memory count collection (first in array)
-        if (collectionsData.length > 0 && !selectedCollection) {
-          onSelectionChange(collectionsData[0].name);
+        // Set default selection to highest memory count collection (first in sorted array)
+        if (sortedCollections.length > 0 && !selectedCollection) {
+          onSelectionChange(sortedCollections[0].name);
         }
       } catch (error: any) {
         console.error('📚 COLLECTIONS DROPDOWN: Error fetching collections:', error);
@@ -86,10 +87,10 @@ export default function CollectionsDropdown({
           onClick={() => !isDisabled && !isLoading && setIsOpen(!isOpen)}
           disabled={isDisabled || isLoading}
           className={`
-            bg-[#ffea67] border border-black rounded-full px-4 py-2.5 
+            bg-[#ffea67] ${isOpen ? 'border-[3px]' : 'border'} border-black rounded-full px-4 py-2.5 
             flex items-center justify-between font-inter   text-black text-sm
-            ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#ffe54d] cursor-pointer'}
-            transition-colors duration-200 min-h-[40px] min-w-[200px] max-w-[250px]
+            ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#ffe54d] hover:border-[3px] cursor-pointer'}
+            transition-all duration-200 min-h-[40px] min-w-[200px] max-w-[250px]
           `}
         >
           <span className="truncate font-inter">{getDisplayValue()}</span>
