@@ -253,10 +253,6 @@ export const deleteNote = async (docId: string) => {
   return api.delete(`/notes/${encodeURIComponent(docId)}`);
 };
 
-export const generateSummary = async (content: string) => {
-  console.log('📄 API CLIENT: Generating summary');
-  return api.post('/summary/generate', { content });
-};
 
 export const getQuotes = async () => {
   console.log('💬 API CLIENT: Fetching quotes');

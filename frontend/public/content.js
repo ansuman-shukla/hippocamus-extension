@@ -48,8 +48,6 @@ if (window.location.protocol === "chrome:") {
   window.location.href = chrome.runtime.getURL("error.html");
 }
 
-// Flag to prevent duplicate summary generation requests
-let isGeneratingSummary = false;
 
 // Global state tracking
 let extensionState = window.hippoCampusExtensionState || {
@@ -112,85 +110,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     }
     
     sendResponse({success: true});
-  }
-  if (message.action === "extractPageContent") {
-    // Prevent duplicate summary generation
-    if (isGeneratingSummary) {
-      console.log("Summary generation already in progress, ignoring duplicate request");
-      sendResponse({ error: "Summary generation already in progress" });
-      return;
-    }
-    
-    isGeneratingSummary = true;
-    
-    const elements = Array.from(document.querySelectorAll('div, p, a'));
-    const seen = new Set();
-    let lines = elements
-      .filter(el => !el.querySelector('div, p, a'))
-      .filter(el => {
-        const style = window.getComputedStyle(el);
-        return (
-          el.offsetParent !== null &&
-          style.display !== "none" &&
-          style.visibility !== "hidden"
-        );
-      })
-      .map(el => el.textContent?.replace(/\s+/g, ' ').trim() || '')
-      .filter(text => text.length > 2 && !seen.has(text) && seen.add(text)); 
-
-    let content = lines.join('\n').replace(/\n{2,}/g, '\n');
-    
-    // Send message to extension frontend to handle API call
-    const sidebar = document.getElementById("my-extension-sidebar");
-    if (sidebar) {
-      const iframe = sidebar.querySelector('iframe');
-      if (iframe) {
-        // Create a promise to handle the response
-        const messageId = Date.now() + Math.random();
-        const responseHandler = (event) => {
-          if (event.data && event.data.messageId === messageId) {
-            window.removeEventListener('message', responseHandler);
-            isGeneratingSummary = false;
-            
-            if (event.data.success) {
-              console.log("Content summarized successfully");
-              console.log("Summary:", event.data.data);
-              sendResponse({ content: event.data.data });
-            } else {
-              const errorMessage = event.data.error || "Failed to generate summary";
-              
-              // Handle rate limit error specifically
-              if (errorMessage === 'RATE_LIMIT_EXCEEDED') {
-                console.log("🚫 CONTENT: Rate limit exceeded for summary generation");
-                console.log("   ├─ This is a legitimate daily limit reached");
-                sendResponse({ 
-                  error: 'RATE_LIMIT_EXCEEDED'
-                });
-              } else {
-                console.error("❌ CONTENT: Failed to generate summary:", errorMessage);
-                sendResponse({ error: errorMessage });
-              }
-            }
-          }
-        };
-        
-        window.addEventListener('message', responseHandler);
-        
-        // Send message to iframe
-        iframe.contentWindow.postMessage({ 
-          action: "generateSummary", 
-          content: content,
-          messageId: messageId
-        }, "*");
-      } else {
-        isGeneratingSummary = false;
-        sendResponse({ error: "Extension iframe not found" });
-      }
-    } else {
-      isGeneratingSummary = false;
-      sendResponse({ error: "Extension not open" });
-    }
-    return true;
   }
 });
   

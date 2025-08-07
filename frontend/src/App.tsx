@@ -4,7 +4,6 @@ import SearchPage from "./page/SearchPage";
 import Intro from "./page/IntroPage";
 import SearchResponse from "./page/SearchResultPage";
 import ResponsePage from "./page/ResponsePage";
-import SummarizePage from "./page/SummarizePage";
 import './index.css';
 
 
@@ -18,7 +17,7 @@ const pageVariants = {
 import { ReactNode, useEffect, useState } from "react";
 import { useSimpleAuth } from "./components/SimpleAuth";
 import AuthLoadingIndicator from "./components/AuthLoadingIndicator";
-import { getQuotes, generateSummary } from "./utils/apiClient";
+import { getQuotes } from "./utils/apiClient";
 
 // Extend Window interface to include our custom property
 declare global {
@@ -58,31 +57,13 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
       }
     };
 
-    // Message listener for focus requests and generateSummary requests from content script
+    // Message listener for focus requests from content script
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.action === "focusSearch") {
         console.log('🔍 APP: Focus search message received from content script');
         Navigate("/search");
       }
       
-      if (event.data && event.data.action === "generateSummary") {
-        const { content, messageId } = event.data;
-        console.log('📝 APP: Generate summary request received');
-        
-        generateSummary(content)
-          .then(data => {
-            console.log("Summary generated successfully:", data);
-            if (event.source) {
-              event.source.postMessage({ success: true, data, messageId }, { targetOrigin: "*" });
-            }
-          })
-          .catch(error => {
-            console.error("Failed to generate summary:", error);
-            if (event.source) {
-              event.source.postMessage({ success: false, error: error.message, messageId }, { targetOrigin: "*" });
-            }
-          })
-      }
     };
 
     // Add event listeners
@@ -230,7 +211,6 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
         <Route path="/submit" element={<PageWrapper><ResponsePage /></PageWrapper>} />
         <Route path="/search" element={<PageWrapper><SearchPage Quote={quotes[Math.floor(Math.random() * quotes.length)]} /></PageWrapper>} />
         <Route path="/response" element={<PageWrapper><SearchResponse /></PageWrapper>} />
-        <Route path="/summarize" element={<PageWrapper><SummarizePage /></PageWrapper>} />
       </Routes>
     </AnimatePresence>
   );

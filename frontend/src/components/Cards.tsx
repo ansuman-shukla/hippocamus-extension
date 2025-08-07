@@ -66,7 +66,7 @@ isSearchAll
                 {isSelected ? (
                   <p className="nyr text-[16px] mb-2 truncate">{date}</p>
                 ) : null}
-                <h2 className={`text-[22px] nyr mb-[0.8rem] leading-tight ${
+                <h2 className={`text-[22px] font-rubik mb-[0.8rem] leading-tight ${
                   isSelected 
                     ? 'break-words' 
                     : 'truncate'
@@ -76,12 +76,12 @@ isSearchAll
                     : title}
                 </h2>
                 <div 
-                  className={`font-SansMono400 text-sm leading-snug opacity-90 ${
+                  className={`text-sm leading-snug opacity-90 ${
                     isSelected 
                       ? 'pb-[45px] break-words max-h-[180px] overflow-y-auto scrollbar-hide' 
                       : 'line-clamp-2'
                   }`}
-                  style={{ backgroundColor: `var(${bgColor})` }}
+                  style={{ backgroundColor: `var(${bgColor})`, fontFamily: 'Inter, sans-serif' }}
                   onClick={(e) => {
                     if (isSelected) {
                       e.stopPropagation();

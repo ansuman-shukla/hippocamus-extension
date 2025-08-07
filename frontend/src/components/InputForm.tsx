@@ -163,7 +163,8 @@ export default function InputForm({
             className="w-full text-[15px] border-b border-black bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-1 scrollbar-hide"
             placeholder="Add micro-note for better search results (press Enter to save)"
             disabled={isLoading || leftBtnTxt === "CLOSE"}
-          />
+
+/>
         </div>
 
       </div>) :

@@ -180,7 +180,7 @@ export default function SearchPage({ Quote }: Props) {
                                 }
                             }}
                             className="bg-transparent focus:outline-none text-black placeholder:text-[11px] placeholder:text-black flex-grow
-                            font-SansText400 pb-[1px] placeholder:tracking-widest
+                            font-rubik pb-[1px] placeholder:tracking-widest
                             placeholdder-opacity-25 transition-all duration-300 ease-in-out"
                         />
 
@@ -192,7 +192,7 @@ export default function SearchPage({ Quote }: Props) {
                     </div>
                 </div>
 
-                <div className={`font-NanumMyeongjo  text-4xl text-center ${isError ? "text-red-900" : "text-black"}`}>
+                <div className={`font-rubik  text-4xl text-center ${isError ? "text-red-900" : "text-black"}`}>
                     <motion.h1
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
