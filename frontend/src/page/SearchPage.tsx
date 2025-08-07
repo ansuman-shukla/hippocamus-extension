@@ -17,8 +17,39 @@ export default function SearchPage({ Quote }: Props) {
     const Navigate = useNavigate();
     const [query, setQuery] = useState<string>("");
     const [isLoading, setIsLoading] = useState<boolean>(false);
+    const [isRippling, setIsRippling] = useState<boolean>(false);
+    const [rippleColors, setRippleColors] = useState<[string, string]>(["#76ADFF", "#FF8E59"]);
     const [isError, setisError] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    // Vibrant subset: only greens, yellows, oranges (solid, high-contrast)
+    const cardColors = [
+        '#39ff88', // neon green
+        '#48f08b', // green
+        '#d7ff40', // electric lime
+        '#ff7b00', // bright orange
+        '#ff8e59', // orange
+        '#ffba00', // marigold
+        '#fffa33', // bright yellow
+        '#eebc41', // golden yellow
+    ];
+
+    const getRandomRipplePair = (): [string, string] => {
+        const first = cardColors[Math.floor(Math.random() * cardColors.length)];
+        let second = cardColors[Math.floor(Math.random() * cardColors.length)];
+        if (second === first) {
+            second = cardColors[(cardColors.indexOf(first) + 5) % cardColors.length];
+        }
+        // Make them more visible by adding transparency for box-shadow color
+        const toRGBA = (hex: string, alpha: number) => {
+            const sanitized = hex.replace('#', '');
+            const bigint = parseInt(sanitized, 16);
+            const r = (bigint >> 16) & 255;
+            const g = (bigint >> 8) & 255;
+            const b = bigint & 255;
+            return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+        };
+        return [toRGBA(first, 0.9), toRGBA(second, 0.7)];
+    };
 
     // const tabs = ["All", "Bookmarks", "Notes"];
 
@@ -161,14 +192,34 @@ export default function SearchPage({ Quote }: Props) {
 
                 <div className="max-w-md bg-white rounded-lg px-10 w-[420px] h-[500px] flex flex-col  justify-between py-10 border border-black">
                     <div className=" flex flex-col gap-2 ">
-                    <div className="relative flex border-black border-[1.5px] rounded-full px-4 py-1 justify-between min-h-[43px]
-                font-SansText400">
+                    <div
+                        className={`relative flex border-black border-[1.5px] rounded-full px-4 py-1 justify-between min-h-[43px]
+                font-SansText400 ripple-wrapper ${isRippling ? 'ripple-active' : ''}`}
+                        style={{
+                            // Pass vibrant colors to CSS as ring colors
+                            // First and second ring colors
+                            ['--ripple-color-1' as any]: rippleColors[0],
+                            ['--ripple-color-2' as any]: rippleColors[1]
+                        }}
+                        onMouseDown={() => setIsRippling(false)}
+                        onClick={() => setIsRippling(false)}
+                    >
                         <input
                             ref={inputRef}
                             type="text"
                             placeholder="SEARCH BOOKMARKS & NOTES - PRESS ENTER"
                             value={query}
-                            onChange={(e) => setQuery(e.target.value)}
+                            onChange={(e) => {
+                                setQuery(e.target.value);
+                                // If a ripple is already running, ignore this keystroke to allow it to finish
+                                if (!isRippling) {
+                                    setIsRippling(true);
+                                    setRippleColors(getRandomRipplePair());
+                                    // End ripple strictly after animation duration (matches CSS 2.1s + delay margin)
+                                    window.clearTimeout((window as any).__rippleTimeout);
+                                    (window as any).__rippleTimeout = window.setTimeout(() => setIsRippling(false), 2200);
+                                }
+                            }}
                             onKeyDown={(e) => {
                                 if (e.key === "Enter") {
                                     if (query.length < 3) {

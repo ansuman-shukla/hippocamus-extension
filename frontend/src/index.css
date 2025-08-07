@@ -234,3 +234,40 @@ textarea{
   margin: 0px !important;
 }
 
+/* Ripple effect for search input wrapper (box-shadow based to avoid overflow/scrollbars) */
+.ripple-wrapper {
+  position: relative;
+  isolation: isolate;
+}
+
+.ripple-wrapper::before,
+.ripple-wrapper::after {
+  content: "";
+  position: absolute;
+  inset: 0; /* match the pill exactly */
+  border-radius: inherit; /* use same rounded-full shape */
+  pointer-events: none;
+  z-index: 0; /* under content but above background */
+  opacity: 0;
+  /* color injected via CSS variables from React */
+  --ripple-color: rgba(0,0,0,.22);
+  box-shadow: 0 0 0 0 var(--ripple-color);
+}
+
+.ripple-active::before { 
+  --ripple-color: var(--ripple-color-1, rgba(0,0,0,.22));
+  animation: ripple-shadow 2.1s cubic-bezier(.65, 0, .34, 1);
+}
+
+.ripple-active::after { 
+  --ripple-color: var(--ripple-color-2, rgba(0,0,0,.22));
+  animation: ripple-shadow 2.1s cubic-bezier(.65, 0, .34, 1);
+  animation-delay: .55s;
+}
+
+@keyframes ripple-shadow {
+  0% { opacity: .9; box-shadow: 0 0 0 0 var(--ripple-color); }
+  60% { opacity: .35; box-shadow: 0 0 0 24px var(--ripple-color); }
+  100% { opacity: 0; box-shadow: 0 0 0 42px var(--ripple-color); }
+}
+
