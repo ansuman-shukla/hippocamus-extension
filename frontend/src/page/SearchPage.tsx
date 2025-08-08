@@ -1,4 +1,5 @@
 import Button from "../components/Button";
+import { IoSearch } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
@@ -190,11 +191,11 @@ export default function SearchPage({ Quote }: Props) {
     return (
         <>
 
-                <div className="max-w-md bg-white rounded-lg px-10 w-[420px] h-[500px] flex flex-col  justify-between py-10 border border-black">
+                <div className="max-w-md bg-white px-10 w-[420px] h-[500px] flex flex-col  justify-between py-10 neo-surface">
                     <div className=" flex flex-col gap-2 ">
                     <div
-                        className={`relative flex border-black border-[1.5px] rounded-full px-4 py-1 justify-between min-h-[43px]
-                font-SansText400 ripple-wrapper ${isRippling ? 'ripple-active' : ''}`}
+                        className={`relative flex rounded-full px-4 py-1 justify-between min-h-[43px]
+                font-SansText400 ripple-wrapper neo-surface-pill ${isRippling ? 'ripple-active' : ''}`}
                         style={{
                             // Pass vibrant colors to CSS as ring colors
                             // First and second ring colors
@@ -230,10 +231,14 @@ export default function SearchPage({ Quote }: Props) {
                                     }
                                 }
                             }}
-                            className="bg-transparent focus:outline-none text-black placeholder:text-[11px] placeholder:text-black flex-grow
+                            className="bg-transparent focus:outline-none text-black placeholder:text-[11px] placeholder:text-black flex-grow pr-8
                             font-rubik pb-[1px] placeholder:tracking-widest
                             placeholdder-opacity-25 transition-all duration-300 ease-in-out"
                         />
+
+                        {!isLoading && (
+                            <IoSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-black text-[18px]" />
+                        )}
 
                         {isLoading && (
                             <div>
@@ -252,12 +257,18 @@ export default function SearchPage({ Quote }: Props) {
                     >"{isError ? "The Query must be atleast 3 characters !" : Quote}"</motion.h1>
                 </div>
                 <div className="w-[95%] mx-auto flex justify-between items-center">
-                    <Button text="HOME" handle={() => Navigate("/submit")} textColor="--primary-white"
-                        IncMinWidth="118px" />
-                    <Button 
-                        text={query.trim() ? "SEARCH" : "SHOW ALL"} 
-                        handle={query.trim() ? handleSearch : handleSearchAll} 
-                        textColor="--primary-white" 
+                    <Button
+                        text="HOME"
+                        handle={() => Navigate("/submit")}
+                        textColor="--primary-white"
+                        IncMinWidth="118px"
+                        variant="home"
+                    />
+                    <Button
+                        text={query.trim() ? "SEARCH" : "SHOW ALL"}
+                        handle={query.trim() ? handleSearch : handleSearchAll}
+                        textColor="--primary-white"
+                        variant={query.trim() ? 'search' : 'showall'}
                     />
                 </div>
             </div>

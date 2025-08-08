@@ -93,11 +93,10 @@ export default function CollectionsDropdown({
           disabled={isDisabled || isLoading}
           aria-expanded={isOpen}
           className={`
-            bg-[#ffea67] ${isOpen ? 'border-[3px] border-b-0 rounded-t-3xl' : 'border rounded-full'}
-            border-black px-4 h-11 min-w-[200px] max-w-[250px]
-            flex items-center justify-between text-black text-sm font-inter
-            ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#ffe54d] cursor-pointer'}
-            transition-colors duration-200
+            neo-dropdown-trigger px-4 h-11 min-w-[200px] max-w-[250px]
+            flex items-center justify-between text-black text-sm font-inter bg-white
+            ${isDisabled || isLoading ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+            transition-all duration-200
           `}
         >
           <span className="truncate">{getDisplayValue()}</span>
@@ -114,8 +113,7 @@ export default function CollectionsDropdown({
           >
             <div
               className={`
-                ${isOpen ? 'border-[3px] border-t-0' : 'border-0'} border-black rounded-b-3xl overflow-hidden
-                bg-[#ffea67]
+                neo-dropdown-panel overflow-hidden
                 transition-[max-height] duration-300 ease-out
               `}
               style={{ maxHeight: isOpen ? `${Math.min(MAX_VISIBLE_ITEMS, collections.length) * ITEM_HEIGHT}px` : '0px' }}
@@ -130,8 +128,7 @@ export default function CollectionsDropdown({
                       type="button"
                       onClick={() => handleSelect(collection.name)}
                       className={`
-                        w-full text-left px-4 h-10 text-sm flex items-center transition-colors duration-150
-                        hover:bg-black/10
+                        w-full text-left px-4 h-10 text-sm flex items-center transition-colors duration-150 neo-dropdown-item
                         ${selectedCollection === collection.name ? 'bg-black/10 font-medium' : ''}
                       `}
                     >

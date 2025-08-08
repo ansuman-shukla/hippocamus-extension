@@ -30,7 +30,7 @@ isSearchAll
     return (
         <>
           <div
-            className={`${bgColor} rounded-lg p-4 mb-4 relative cursor-pointer flex-col justify-between
+            className={`${bgColor} neo-card p-4 mb-4 relative cursor-pointer flex-col justify-between
             ${
               isSelected
                 ? `scale-100 min-h-[415px] w-[100%]`

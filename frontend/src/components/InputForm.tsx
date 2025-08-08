@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import Button from "./Button";
-import LoaderPillars from "./LoaderPillars";
+ 
 import CollectionsDropdown from "./CollectionsDropdown";
 
 interface Props {
@@ -209,16 +209,25 @@ export default function InputForm({
 
 
       <div className={`flex ${leftBtnTxt === "CLOSE" ? 'justify-center' : 'justify-between'} mx-auto ${Error || leftBtnTxt === "CLOSE" ? "pt-4" : "pt-8"}`} style={{ marginTop: '6px' }}>
-        {isLoading ? (
-          <div className="flex justify-center w-full">
-            <LoaderPillars />
-          </div>
-        ) : (
-          <>
-            <Button handle={handleClear} text={leftBtnTxt} textColor={BtnTxtClr} iSdisabled={false} />
-            {leftBtnTxt === "CLOSE" ? null : <Button handle={handleSubmit} text={rightBtnTxt} textColor={BtnTxtClr} IncMinWidth="129px" iSdisabled={false} />}
-          </>
-        )}
+        <>
+          <Button 
+            handle={handleClear} 
+            text={leftBtnTxt} 
+            textColor={BtnTxtClr} 
+            iSdisabled={isLoading}
+            variant={leftBtnTxt === 'SEARCH' ? 'search' : undefined}
+          />
+          {leftBtnTxt === "CLOSE" ? null : (
+            <Button
+              handle={handleSubmit}
+              text={rightBtnTxt}
+              textColor={BtnTxtClr}
+              IncMinWidth="129px"
+              iSdisabled={isLoading}
+              variant={rightBtnTxt === 'SAVE' ? 'save' : undefined}
+            />
+          )}
+        </>
       </div>
     </form>
   );

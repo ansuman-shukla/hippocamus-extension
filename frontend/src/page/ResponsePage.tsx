@@ -14,9 +14,9 @@ interface FormData {
 export default function ResponsePage() {
 
 const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
-  const [BtnTxtClr, setBtnTxtClr] = useState("--primary-yellow");
+  const [BtnTxtClr, setBtnTxtClr] = useState("--primary-white");
   const [rightBtnTxt, setRtBtnTxt] = useState("SAVE");
-  const [bgClr, setbgClr] = useState("--primary-yellow");
+  const [bgClr, setbgClr] = useState("--off-white");
   const [isError, setisError] = useState('');
   const [showOnlyOne, setShowOnlyOne] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -194,8 +194,8 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
   return (
     <>
 
-      <div className={`max-w-md bg-[var(${bgClr})] rounded-lg px-9 w-[420px] h-[500px] flex flex-col justify-between pt-1 pb-8
-      border border-black`}>
+      <div className={`max-w-md px-9 w-[420px] h-[500px] flex flex-col justify-between pt-1 pb-8 neo-surface`}
+      style={{ backgroundColor: `var(${bgClr})` }}>
 
 
         <div className="flex justify-between items-center mb-1 gap-2 ">

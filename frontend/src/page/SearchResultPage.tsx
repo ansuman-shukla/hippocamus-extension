@@ -278,10 +278,8 @@ const SearchResponse: React.FC = () => {
 
   return (
     <div
-
-      style={{ backgroundColor: responseData.length === 0 ? 'var(--primary-red)' : 'var(--primary-white)' }}
-
-      className={`relative max-w-md  rounded-lg w-[420px] h-[500px] flex flex-col justify-center border border-black py-0 overflow-hidden`}>
+      style={{ backgroundColor: responseData.length === 0 ? 'var(--primary-red)' : 'var(--off-white)' }}
+      className={`relative max-w-md rounded-lg w-[420px] h-[500px] flex flex-col justify-center extension-frame py-0 overflow-hidden`}>
       {Card.length === 0 ? (
         <div className='text-center px-6'>
           <p className='text-2xl black mb-3 pb-7 nyr-semibold'>
@@ -419,6 +417,7 @@ const SearchResponse: React.FC = () => {
             }
           }}
           textColor='--primary-white'
+          variant={DeleteClicked ? undefined : 'back'}
         />
         <Button
           text={DeleteClicked ? "YES" : 'HOME'}
@@ -432,6 +431,7 @@ const SearchResponse: React.FC = () => {
             }
           }}
           textColor='--primary-white'
+          variant={DeleteClicked ? undefined : 'home'}
         />
       </div>
     </div>

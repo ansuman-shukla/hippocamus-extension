@@ -6,20 +6,29 @@ interface Props {
     textColor: string; 
     iSdisabled ?: boolean;
     IncMinWidth?:string;
+    variant?: 'save' | 'search' | 'home' | 'back' | 'showall';
+    className?: string;
   }
   
-  export default function Button({ handle, text, textColor, iSdisabled,IncMinWidth }: Props) {
-
+  export default function Button({ handle, text, textColor, iSdisabled,IncMinWidth, variant, className }: Props) {
+    const resolvedTextColor = textColor === "--primary-white" ? "#151515" : `var(${textColor})`;
     return (
       <button
         type="button"
         onClick={handle}
-        style={{color:`var(${textColor})`, minWidth: IncMinWidth ? `${IncMinWidth}`: '118px'}}
-        className={`bg-black px-6 py-3 rounded-full 
-                    hover:bg-transparent hover:text-black transition-colors
-                    inter-500 text-button border border-black tracking-wider`}
-        onMouseEnter={(e) => (e.currentTarget.style.color = "black")}
-        onMouseLeave={(e) => (e.currentTarget.style.color = `var(${textColor})`)}
+        style={{color: resolvedTextColor, minWidth: IncMinWidth ? `${IncMinWidth}`: '118px'}}
+        className={`neo-button-filled px-6 py-3 rounded-full ${
+                      variant === 'save' ? 'neo-button-variant-save' : ''
+                    } ${
+                      variant === 'search' ? 'neo-button-variant-search' : ''
+                    } ${
+                      variant === 'home' ? 'neo-button-variant-home' : ''
+                    } ${
+                      variant === 'back' ? 'neo-button-variant-back' : ''
+                    } ${
+                      variant === 'showall' ? 'neo-button-variant-showall' : ''
+                    } ${className || ''}
+                    inter-500 text-button tracking-wider transition-all duration-200`}
         disabled={iSdisabled}
         
       >
