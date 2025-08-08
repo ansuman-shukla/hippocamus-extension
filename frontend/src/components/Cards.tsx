@@ -55,7 +55,7 @@ isSearchAll
                    className={`p-0 flex-shrink-0 ${bgColor}`}>
                      <MdDelete
                      onClick={()=>setDeleteClicked(true)}
-                     size={24} className="self-start"/>
+                     size={24} className="self-start transition-transform duration-150 ease-out hover:scale-110"/>
               </button>
 
            
@@ -95,9 +95,9 @@ isSearchAll
              <div className="w-full flex justify-end mb-2" style={{ backgroundColor: `var(${bgColor})` }}>
                 {
                   RedirectUrl ?
-                  <RiArrowRightUpLine size={28} className={type === "Note" ? "cursor-default opacity-50" : "cursor-pointer"} onClick={()=>{isSelected && type !== "Note" ? window.open(RedirectUrl) : null}}/>
+                  <RiArrowRightUpLine size={28} className={type === "Note" ? "cursor-default opacity-50" : `cursor-pointer ${isSelected ? 'transition-transform duration-150 ease-out hover:scale-110' : ''}`} onClick={()=>{isSelected && type !== "Note" ? window.open(RedirectUrl) : null}}/>
                   :
-                  <MdOutlineEditNote size={28} className={type === "Note" ? "cursor-default opacity-50" : "cursor-pointer"} onClick={()=>{isSelected && type !== "Note" ? window.open(RedirectUrl) : null}}/>
+                  <MdOutlineEditNote size={28} className={type === "Note" ? "cursor-default opacity-50" : `cursor-pointer ${isSelected ? 'transition-transform duration-150 ease-out hover:scale-110' : ''}`} onClick={()=>{isSelected && type !== "Note" ? window.open(RedirectUrl) : null}}/>
                 }
               </div>
               {isSelected && type !== "Note" && RedirectUrl && (

@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import Button from "./Button";
+import SavingLoader from "./SavingLoader";
  
 import CollectionsDropdown from "./CollectionsDropdown";
 
@@ -208,27 +209,33 @@ export default function InputForm({
 
 
 
-      <div className={`flex ${leftBtnTxt === "CLOSE" ? 'justify-center' : 'justify-between'} mx-auto ${Error || leftBtnTxt === "CLOSE" ? "pt-4" : "pt-8"}`} style={{ marginTop: '6px' }}>
-        <>
-          <Button 
-            handle={handleClear} 
-            text={leftBtnTxt} 
-            textColor={BtnTxtClr} 
-            iSdisabled={isLoading}
-            variant={leftBtnTxt === 'SEARCH' ? 'search' : undefined}
-          />
-          {leftBtnTxt === "CLOSE" ? null : (
-            <Button
-              handle={handleSubmit}
-              text={rightBtnTxt}
-              textColor={BtnTxtClr}
-              IncMinWidth="129px"
-              iSdisabled={isLoading}
-              variant={rightBtnTxt === 'SAVE' ? 'save' : undefined}
+      {isLoading ? (
+        <div className={`relative h-[90px] flex justify-center items-center mx-auto ${Error ? "pt-4" : "pt-8"}`} style={{ marginTop: '6px' }}>
+          <SavingLoader />
+        </div>
+      ) : (
+        <div className={`flex ${leftBtnTxt === "CLOSE" ? 'justify-center' : 'justify-between'} mx-auto ${Error || leftBtnTxt === "CLOSE" ? "pt-4" : "pt-8"}`} style={{ marginTop: '6px' }}>
+          <>
+            <Button 
+              handle={handleClear} 
+              text={leftBtnTxt} 
+              textColor={BtnTxtClr} 
+              iSdisabled={false}
+              variant={leftBtnTxt === 'CLOSE' ? 'close' : (leftBtnTxt === 'SEARCH' ? 'search' : undefined)}
             />
-          )}
-        </>
-      </div>
+            {leftBtnTxt === "CLOSE" ? null : (
+              <Button
+                handle={handleSubmit}
+                text={rightBtnTxt}
+                textColor={BtnTxtClr}
+                IncMinWidth="129px"
+                iSdisabled={false}
+                variant={rightBtnTxt === 'SAVE' ? 'save' : undefined}
+              />
+            )}
+          </>
+        </div>
+      )}
     </form>
   );
 }

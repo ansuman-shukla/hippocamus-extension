@@ -29,7 +29,7 @@ const Intro = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: "ease" }}
-        className="h-[500px] w-[100%] relative border border-black rounded-lg overflow-hidden">
+        className="h-[500px] w-[100%] relative rounded-lg overflow-hidden">
 
           <div className="absolute inset-0 flex">
             <div className="w-1/4 bg-[var(--primary-orange)]" />
@@ -39,13 +39,13 @@ const Intro = () => {
           </div>
 
           <div className="relative h-[500px] w-[419px] flex my-auto justify-center rounded-lg">
-            <div className="flex flex-col items-center text-center space-y-8 p-8">
+            <div className="flex flex-col items-center text-center space-y-8 p-6 mx-6 my-auto rubik">
 
               <div className="flex items-center mb-16">
                 <img src={Logo} alt="" className="pl-6"/>
               </div>
 
-              <p className="text-4xl nyr max-w-md">
+              <p className="text-4xl rubik max-w-md">
                 "Every bookmark is a doorway to a new journey"
               </p>
 
@@ -55,7 +55,7 @@ const Intro = () => {
                 </div>
               )}
 
-              <Button handle={handleAuth} text="GET STARTED" textColor="--primary-white"/>
+              <Button handle={handleAuth} text="GET STARTED" textColor="--primary-white" variant="close" className="rubik"/>
             </div>
           </div>
         </motion.div>

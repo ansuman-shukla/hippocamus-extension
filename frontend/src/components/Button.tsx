@@ -6,17 +6,18 @@ interface Props {
     textColor: string; 
     iSdisabled ?: boolean;
     IncMinWidth?:string;
-    variant?: 'save' | 'search' | 'home' | 'back' | 'showall';
+    variant?: 'save' | 'search' | 'home' | 'back' | 'showall' | 'close';
     className?: string;
   }
   
   export default function Button({ handle, text, textColor, iSdisabled,IncMinWidth, variant, className }: Props) {
     const resolvedTextColor = textColor === "--primary-white" ? "#151515" : `var(${textColor})`;
+    const finalTextColor = variant === 'close' ? '#ffffff' : resolvedTextColor;
     return (
       <button
         type="button"
         onClick={handle}
-        style={{color: resolvedTextColor, minWidth: IncMinWidth ? `${IncMinWidth}`: '118px'}}
+        style={{color: finalTextColor, minWidth: IncMinWidth ? `${IncMinWidth}`: '118px'}}
         className={`neo-button-filled px-6 py-3 rounded-full ${
                       variant === 'save' ? 'neo-button-variant-save' : ''
                     } ${
@@ -27,6 +28,8 @@ interface Props {
                       variant === 'back' ? 'neo-button-variant-back' : ''
                     } ${
                       variant === 'showall' ? 'neo-button-variant-showall' : ''
+                    } ${
+                      variant === 'close' ? 'neo-button-variant-close' : ''
                     } ${className || ''}
                     inter-500 text-button tracking-wider transition-all duration-200`}
         disabled={iSdisabled}

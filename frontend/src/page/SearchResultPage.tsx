@@ -308,10 +308,9 @@ const SearchResponse: React.FC = () => {
         }
       
       <div className={` 
-        
         ${selectedIndex === null
           ? `overflow-y-scroll py-3 ${isSearchAll ? 'pt-[62px]' : ''} pb-[89px] px-3 `
-          : 'overflow-y-scroll py-0 px-0 cursor-default'}
+          : 'overflow-y-scroll py-3 px-3 cursor-default'}
         [&::-webkit-scrollbar]:hidden w-[100%] h-[100%]`}>
         {selectedIndex === null
           ?
@@ -402,37 +401,39 @@ const SearchResponse: React.FC = () => {
       )}
 
 
-      <div className="absolute bottom-0 rounded-b-lg w-full min-h-[90px] flex items-center justify-between px-10 bg-white border-t border-black">
-        <Button
-          text={DeleteClicked ? "NO" : 'BACK'}
-          handle={() => {
-            if (DeleteClicked) {
-              setDeleteClicked(false);
-            } else {
-
+      <div className="absolute bottom-0 w-full min-h-[90px] flex items-center justify-center px-10 bg-white border-t border-black">
+        {DeleteClicked ? (
+          <div className="flex items-center gap-6">
+            <Button
+              text={"NO"}
+              handle={() => {
+                setDeleteClicked(false);
+              }}
+              textColor='--primary-white'
+            />
+            <Button
+              text={"YES"}
+              handle={() => {
+                handleDelete();
+                setDeleteClicked(false);
+                setConfirmDelete(true);
+              }}
+              textColor='--primary-white'
+            />
+          </div>
+        ) : (
+          <Button
+            text={'BACK'}
+            handle={() => {
               if (selectedIndex === null) Navigate("/search");
               else setSelectedIndex(null);
               setConfirmDelete(false);
               setDeleteSuccess(false);
-            }
-          }}
-          textColor='--primary-white'
-          variant={DeleteClicked ? undefined : 'back'}
-        />
-        <Button
-          text={DeleteClicked ? "YES" : 'HOME'}
-          handle={() => {
-            if (DeleteClicked) {
-              handleDelete();
-              setDeleteClicked(false);
-              setConfirmDelete(true);
-            } else {
-              Navigate("/submit");
-            }
-          }}
-          textColor='--primary-white'
-          variant={DeleteClicked ? undefined : 'home'}
-        />
+            }}
+            textColor='--primary-white'
+            variant={'back'}
+          />
+        )}
       </div>
     </div>
   );
