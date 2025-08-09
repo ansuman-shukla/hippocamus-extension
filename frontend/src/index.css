@@ -396,6 +396,12 @@ textarea{
 }
 
 /* Dropdown */
+/* Root wrapper for dropdown to centralize radius control */
+.neo-dropdown {
+  /* Rounded corners for open state (avoid semicircle) */
+  --dropdown-radius: 20px;
+}
+
 .neo-dropdown-trigger {
   background: #ffffff;
   border-radius: 9999px;
@@ -405,12 +411,14 @@ textarea{
     -4px -4px 10px rgba(255,255,255,0.9);
 }
 .neo-dropdown-trigger[aria-expanded="true"] {
-  border-bottom-left-radius: 18px;
-  border-bottom-right-radius: 18px;
+  /* When open, the trigger's bottom corners should match the panel */
+  border-bottom-left-radius: var(--dropdown-radius);
+  border-bottom-right-radius: var(--dropdown-radius);
 }
 .neo-dropdown-panel {
   background: #ffffff;
-  border-radius: 0 0 18px 18px;
+  /* Panel bottom corners exactly match the trigger when open */
+  border-radius: 0 0 var(--dropdown-radius) var(--dropdown-radius);
   box-shadow:
     10px 10px 20px rgba(0,0,0,0.12),
     -6px -6px 16px rgba(255,255,255,0.9);
@@ -420,6 +428,16 @@ textarea{
 }
 .neo-dropdown-item:hover {
   background: rgba(0,0,0,0.06);
+}
+/* Scroll container needs the same rounding to clip item hover backgrounds */
+.neo-dropdown-scroll {
+  border-bottom-left-radius: var(--dropdown-radius);
+  border-bottom-right-radius: var(--dropdown-radius);
+}
+/* Ensure the last visible row can visually curve with the panel when highlighted */
+.neo-dropdown-item:last-child {
+  border-bottom-left-radius: var(--dropdown-radius);
+  border-bottom-right-radius: var(--dropdown-radius);
 }
 
 /* Colored button fills */

@@ -85,7 +85,7 @@ export default function CollectionsDropdown({
       </label>
       
       {/* Collections Dropdown (fixed button, panel expands downward) */}
-      <div className="relative w-fit max-w-[250px]">
+      <div className="neo-dropdown relative w-fit max-w-[250px]">
         {/* Button remains fixed */}
         <button
           type="button"
@@ -118,7 +118,7 @@ export default function CollectionsDropdown({
               `}
               style={{ maxHeight: isOpen ? `${Math.min(MAX_VISIBLE_ITEMS, collections.length) * ITEM_HEIGHT}px` : '0px' }}
             >
-              <div className="max-h-[200px] overflow-y-auto scrollbar-hide">
+              <div className="neo-dropdown-scroll max-h-[200px] overflow-y-auto scrollbar-hide">
                 {collections.length === 0 ? (
                   <div className="px-4 py-2 text-sm text-black/70">No collections yet</div>
                 ) : (
