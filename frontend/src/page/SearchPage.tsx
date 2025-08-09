@@ -191,7 +191,7 @@ export default function SearchPage({ Quote }: Props) {
     return (
         <>
 
-                <div className="max-w-md bg-white px-10 w-[420px] h-[500px] flex flex-col  justify-between py-10 neo-surface">
+                <div className="max-w-md bg-white px-10 w-[420px] h-[500px] flex flex-col justify-between py-10 neo-surface extension-frame">
                     <div className=" flex flex-col gap-2 ">
                     <div
                         className={`relative flex rounded-full px-4 py-1 justify-between min-h-[43px]

@@ -372,16 +372,13 @@ textarea{
 .neo-button-variant-close {
   background: #151515 !important;
   color: #ffffff !important;
-  box-shadow:
-    6px 6px 12px rgba(0,0,0,0.3),
-    -4px -4px 10px rgba(255,255,255,0.85);
+  /* remove top-left white bloom; use only soft drop shadow */
+  box-shadow: 6px 6px 12px rgba(0,0,0,0.35);
 }
 .neo-button-variant-close:hover {
   background: #0f0f0f !important;
   color: #ffffff !important;
-  box-shadow:
-    8px 8px 16px rgba(0,0,0,0.35),
-    -5px -5px 12px rgba(255,255,255,0.9);
+  box-shadow: 8px 8px 16px rgba(0,0,0,0.4);
 }
 .neo-button-filled:hover {
   transform: translateY(-0.5px);

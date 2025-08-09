@@ -3,6 +3,14 @@
 const BACKEND_URL = 'http://localhost:8000';
 const API_URL = '__VITE_API_URL__';
 
+// Silence non-critical logs in production
+if (typeof console !== 'undefined') {
+  // Keep errors and warnings; silence verbose logs
+  console.log = () => {};
+  console.info = () => {};
+  console.debug = () => {};
+}
+
 // BACKGROUND SCRIPT STARTUP LOGGING
 console.log('🚀 BACKGROUND: Service worker starting up');
 console.log(`   ├─ Startup time: ${new Date().toISOString()}`);
@@ -217,7 +225,7 @@ console.log('✅ BACKGROUND: chrome.action.onClicked listener registered success
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "test-background-script",
-    title: "🧪 Test Background Script (Alt+M)",
+    title: "Open HippoCampus",
     contexts: ["page"]
   });
 });

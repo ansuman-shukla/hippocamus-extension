@@ -29,7 +29,7 @@ const Intro = () => {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.5, ease: "ease" }}
-        className="h-[500px] w-[100%] relative rounded-lg overflow-hidden">
+        className="h-[500px] w-[100%] relative rounded-lg overflow-hidden extension-frame">
 
           <div className="absolute inset-0 flex">
             <div className="w-1/4 bg-[var(--primary-orange)]" />

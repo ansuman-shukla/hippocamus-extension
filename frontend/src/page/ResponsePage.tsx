@@ -194,7 +194,7 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
   return (
     <>
 
-      <div className={`max-w-md px-9 w-[420px] h-[500px] flex flex-col justify-between pt-1 pb-8 neo-surface`}
+      <div className={`max-w-md px-9 w-[420px] h-[500px] flex flex-col justify-between pt-1 pb-8 neo-surface extension-frame`}
       style={{ backgroundColor: `var(${bgClr})` }}>
 
 
