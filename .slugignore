@@ -1,2 +1,13 @@
-*
-!backend/
+frontend/
+frontend/**
+**/node_modules/**
+*.log
+*.md
+*.MD
+*.markdown
+*.MDOWN
+*.mkdn
+*.mkd
+*.Rmd
+*.rst
+*.txt
