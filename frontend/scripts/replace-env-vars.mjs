@@ -51,16 +51,26 @@ if (existsSync(backgroundPath)) {
 const manifestPath = path.join(process.cwd(), 'dist', 'manifest.json');
 if (existsSync(manifestPath)) {
   let manifestContent = readFileSync(manifestPath, 'utf8');
+
+  // First, replace any placeholders directly in the file text
+  manifestContent = manifestContent.replace(/__VITE_BACKEND_URL__/g, new URL(BACKEND_URL).origin);
+  manifestContent = manifestContent.replace(/__VITE_API_URL__/g, new URL(API_URL).origin);
+
+  // Then parse and normalize host_permissions if needed
   const manifest = JSON.parse(manifestContent);
-  
-  // Update host permissions to use actual backend URL
-  manifest.host_permissions = manifest.host_permissions.map(permission => {
-    if (permission.includes('hippocampus-1.onrender.com')) {
-      return `${new URL(BACKEND_URL).origin}/*`;
-    }
-    return permission;
-  });
-  
+
+  if (Array.isArray(manifest.host_permissions)) {
+    manifest.host_permissions = manifest.host_permissions.map(permission => {
+      // Normalize to origin/* format for any full base URLs that may have path suffixes
+      try {
+        if (permission.startsWith('http://') || permission.startsWith('https://')) {
+          return `${new URL(permission).origin}/*`;
+        }
+      } catch {}
+      return permission;
+    });
+  }
+
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
   console.log('✓ Updated manifest.json');
 }

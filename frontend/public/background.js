@@ -1,6 +1,5 @@
 // Configuration - will be replaced during build
-// const BACKEND_URL = 'https://hippocampus-1.onrender.com';
-const BACKEND_URL = 'http://localhost:8000';
+const BACKEND_URL = '__VITE_BACKEND_URL__';
 const API_URL = '__VITE_API_URL__';
 
 // Silence non-critical logs in production
@@ -149,13 +148,14 @@ async function clearAllAuthCookies() {
   console.log('🧹 BACKGROUND: Starting comprehensive cookie cleanup across all domains');
   
   // All domains where auth cookies might exist
-  const domains = [
-    'https://hippocampus-1.onrender.com',
-    'https://extension-auth.vercel.app',
-    'http://127.0.0.1:8000',
-    'http://localhost:8000',
-    BACKEND_URL
-  ];
+  const domains = (() => {
+    const urls = [BACKEND_URL, API_URL].filter(Boolean);
+    try {
+      return Array.from(new Set(urls.map(u => new URL(u).origin)));
+    } catch {
+      return urls;
+    }
+  })();
   
   // All possible auth cookie names
   const authCookieNames = [

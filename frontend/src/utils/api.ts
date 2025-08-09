@@ -1,8 +1,9 @@
 // Simple API client based on OauthImplementation.md
+import { config } from '../config/environment';
 
-const SUPABASE_URL = "https://dzftiemmhvmtrlooukqd.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6ZnRpZW1taHZtdHJsb291a3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2MTQ5NjEsImV4cCI6MjA1NDE5MDk2MX0.pFPUNjrL52biBlNmwcSwJRxhQ7mx1Elqnh_6OOVABM4";
-const API_BASE_URL = "http://127.0.0.1:8000";
+const SUPABASE_URL = config.SUPABASE_URL;
+const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
+const API_BASE_URL = (config.BACKEND_URL || config.API_URL);
 
 // This is the core function that handles API calls and token refreshing.
 export async function fetchWithAutoRefresh(url: string, options: RequestInit = {}): Promise<Response> {

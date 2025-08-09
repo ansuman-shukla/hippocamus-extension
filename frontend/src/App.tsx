@@ -18,6 +18,7 @@ import { ReactNode, useEffect, useState } from "react";
 import { useSimpleAuth } from "./components/SimpleAuth";
 import AuthLoadingIndicator from "./components/AuthLoadingIndicator";
 import { getQuotes } from "./utils/apiClient";
+import { config } from './config/environment';
 
 // Extend Window interface to include our custom property
 declare global {
@@ -95,7 +96,7 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
       try {
         // Check if user is authenticated via backend cookies and validate them
         const cookie = await chrome.cookies.get({
-          url: import.meta.env.VITE_BACKEND_URL,
+          url: config.BACKEND_URL,
           name: 'access_token',
         });
 
@@ -150,7 +151,7 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
     // Enhanced cookie change monitoring for session management
     const handleCookieChange = (changeInfo: chrome.cookies.CookieChangeInfo) => {
       if (changeInfo.cookie.name === "access_token" && 
-          changeInfo.cookie.domain.includes(new URL(import.meta.env.VITE_BACKEND_URL).hostname)) {
+          changeInfo.cookie.domain.includes(new URL(config.BACKEND_URL as string).hostname)) {
         
         if (changeInfo.removed) {
           console.log('🚫 APP: Backend access token was removed, checking if we need to redirect to auth');

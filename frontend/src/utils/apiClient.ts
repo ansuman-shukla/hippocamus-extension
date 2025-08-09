@@ -2,10 +2,10 @@
 // Uses cookie-based authentication handled by backend middleware
 
 import { logout } from './api';
+import { config } from '../config/environment';
 
 const getApiBaseUrl = (): string => {
-  // Always use the backend API URL for API calls
-  const baseUrl = import.meta.env.VITE_BACKEND_URL;
+  const baseUrl = (config.BACKEND_URL || config.API_URL) as string;
   return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 };
 

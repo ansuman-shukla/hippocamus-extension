@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { logout, checkAuthStatus } from '../utils/api';
+import { config } from '../config/environment';
 
 // Extend Window interface to include our auth check flag
 declare global {
@@ -10,8 +11,8 @@ declare global {
   }
 }
 
-const SUPABASE_URL = "https://dzftiemmhvmtrlooukqd.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImR6ZnRpZW1taHZtdHJsb291a3FkIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg2MTQ5NjEsImV4cCI6MjA1NDE5MDk2MX0.pFPUNjrL52biBlNmwcSwJRxhQ7mx1Elqnh_6OOVABM4";
+const SUPABASE_URL = config.SUPABASE_URL;
+const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
 // Function to refresh tokens
 async function refreshTokens(refreshToken: string) {
