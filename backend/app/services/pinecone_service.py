@@ -2,7 +2,6 @@ from datetime import datetime
 from typing import List, Optional, Dict
 import logging
 from app.core.pinecone_wrapper import safe_index, safe_pc
-from langchain_core.documents import Document
 from app.core.config import settings
 from app.schema.link_schema import Link as LinkSchema
 from app.utils.site_name_extractor import extract_site_name
@@ -124,7 +123,7 @@ async def search_vector_db(
     namespace: Optional[str],
     filter: Optional[Dict] = None,
     top_k: int = 10
-) -> List[Document]:
+) -> List[Dict]:
     """Search using E5 embeddings with metadata filtering for user isolation"""
 
     if not namespace:
@@ -188,8 +187,8 @@ async def search_vector_db(
         logger.info(f"   ├─ Matches count: {len(results.get('matches', []))}")
         logger.info(f"   └─ Raw results: {results}")
 
-        # Convert to Langchain documents format
-        documents = []
+        # Build plain dictionaries (no Langchain Document) to return
+        documents: List[Dict] = []
 
         if documents is None:
             print("No documents found in the search results")
@@ -203,20 +202,20 @@ async def search_vector_db(
             if metadata.get('type') == 'Bookmark':
                 # Clean the note content for display (remove collection pattern)
                 clean_note = remove_collection_pattern_from_text(metadata['note'])
-                documents.append(Document(
-                id=doc_id,
-                page_content=f"Title: {metadata['title']}\nNote: {clean_note}\nSource: {metadata['source_url']}",
-                metadata=metadata
-            ))
+                documents.append({
+                    "id": doc_id,
+                    "page_content": f"Title: {metadata['title']}\nNote: {clean_note}\nSource: {metadata['source_url']}",
+                    "metadata": metadata
+                })
 
             else:
                 # For notes, clean the note content for display (remove collection pattern)
                 clean_note = remove_collection_pattern_from_text(metadata['note'])
-                documents.append(Document(
-                id=doc_id,
-                page_content=f"Title: {metadata['title']}\nNote: {clean_note}",
-                metadata=metadata
-            ))
+                documents.append({
+                    "id": doc_id,
+                    "page_content": f"Title: {metadata['title']}\nNote: {clean_note}",
+                    "metadata": metadata
+                })
 
         if not documents:
             raise SearchExecutionError("No documents found matching query")

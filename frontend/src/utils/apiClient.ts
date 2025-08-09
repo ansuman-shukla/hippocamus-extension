@@ -5,7 +5,7 @@ import { logout } from './api';
 import { config } from '../config/environment';
 
 const getApiBaseUrl = (): string => {
-  const baseUrl = (config.BACKEND_URL || config.API_URL) as string;
+  const baseUrl = config.BACKEND_URL as string;
   return baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
 };
 

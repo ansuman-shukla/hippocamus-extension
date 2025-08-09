@@ -4,12 +4,9 @@ python-jose[cryptography]
 motor
 requests
 python-dotenv
-supabase
 pinecone
+pydantic
 python-dotenv
-langchain_community
-langchain
-langchain_google_genai
 pinecone_text
-google-generativeai
+pydantic-settings
 slowapi

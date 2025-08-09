@@ -8,11 +8,9 @@ import path from 'path';
 config();
 
 const BACKEND_URL = process.env.VITE_BACKEND_URL;
-const API_URL = process.env.VITE_API_URL;
 
 console.log('Replacing environment variables in public files...');
 console.log('BACKEND_URL:', BACKEND_URL);
-console.log('API_URL:', API_URL);
 
 // Update background.js
 const backgroundPath = path.join(process.cwd(), 'dist', 'background.js');
@@ -25,22 +23,10 @@ if (existsSync(backgroundPath)) {
     `const BACKEND_URL = '${BACKEND_URL}';`
   );
   
-  // Replace the API_URL constant
-  backgroundContent = backgroundContent.replace(
-    /const API_URL = '[^']*';/,
-    `const API_URL = '${API_URL}';`
-  );
-  
   // Replace placeholder with actual backend URL
   backgroundContent = backgroundContent.replace(
     /__VITE_BACKEND_URL__/g,
     BACKEND_URL
-  );
-  
-  // Replace placeholder with actual API URL
-  backgroundContent = backgroundContent.replace(
-    /__VITE_API_URL__/g,
-    API_URL
   );
   
   writeFileSync(backgroundPath, backgroundContent);
@@ -54,7 +40,6 @@ if (existsSync(manifestPath)) {
 
   // First, replace any placeholders directly in the file text
   manifestContent = manifestContent.replace(/__VITE_BACKEND_URL__/g, new URL(BACKEND_URL).origin);
-  manifestContent = manifestContent.replace(/__VITE_API_URL__/g, new URL(API_URL).origin);
 
   // Then parse and normalize host_permissions if needed
   const manifest = JSON.parse(manifestContent);

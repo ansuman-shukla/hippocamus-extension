@@ -1,6 +1,5 @@
 // Configuration - will be replaced during build
 const BACKEND_URL = '__VITE_BACKEND_URL__';
-const API_URL = '__VITE_API_URL__';
 
 // Silence non-critical logs in production
 if (typeof console !== 'undefined') {
@@ -149,7 +148,7 @@ async function clearAllAuthCookies() {
   
   // All domains where auth cookies might exist
   const domains = (() => {
-    const urls = [BACKEND_URL, API_URL].filter(Boolean);
+    const urls = [BACKEND_URL].filter(Boolean);
     try {
       return Array.from(new Set(urls.map(u => new URL(u).origin)));
     } catch {

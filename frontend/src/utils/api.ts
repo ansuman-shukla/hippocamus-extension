@@ -3,7 +3,7 @@ import { config } from '../config/environment';
 
 const SUPABASE_URL = config.SUPABASE_URL;
 const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
-const API_BASE_URL = (config.BACKEND_URL || config.API_URL);
+const API_BASE_URL = config.BACKEND_URL;
 
 // This is the core function that handles API calls and token refreshing.
 export async function fetchWithAutoRefresh(url: string, options: RequestInit = {}): Promise<Response> {

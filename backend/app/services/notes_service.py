@@ -5,7 +5,6 @@ from app.core.database_wrapper import safe_collection_notes
 from app.exceptions.httpExceptionsSave import *
 from app.exceptions.httpExceptionsSearch import *
 from app.exceptions.global_exceptions import ExternalServiceError, DatabaseConnectionError
-from langchain_core.documents import Document
 from app.models.notesModel import *
 from app.utils.collection_extractor import extract_collection_from_text, remove_collection_pattern_from_text
 from app.services.pinecone_service import *

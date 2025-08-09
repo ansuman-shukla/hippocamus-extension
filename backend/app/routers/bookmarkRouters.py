@@ -4,7 +4,7 @@ from app.exceptions.httpExceptionsSearch import *
 from app.exceptions.httpExceptionsSave import *
 from app.schema.link_schema import Link as link_schema
 from typing import List, Optional, Dict
-from langchain_core.documents import Document
+# from langchain_core.documents import Document
 from app.services.pinecone_service import *
 from app.services.memories_service import *
 from app.core.rate_limiter import limiter

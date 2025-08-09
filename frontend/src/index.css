@@ -399,7 +399,7 @@ textarea{
 /* Root wrapper for dropdown to centralize radius control */
 .neo-dropdown {
   /* Rounded corners for open state (avoid semicircle) */
-  --dropdown-radius: 20px;
+  --dropdown-radius: 18px;
 }
 
 .neo-dropdown-trigger {

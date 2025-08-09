@@ -4,11 +4,10 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 from app.core.config import settings
 from app.routers.bookmarkRouters import router as bookmark_router
-from app.utils.jwt import decodeJWT, TokenExpiredError
+from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi.middleware.cors import CORSMiddleware
 from app.routers.get_quotes import router as get_quotes_router
 from app.routers.notesRouter import router as notes_router
-from app.routers.summaryRouter import router as summary_router
 from app.routers.auth_router import router as auth_router
 from app.routers.collections_router import router as collections_router
 from app.exceptions.global_exceptions import (
@@ -187,6 +186,5 @@ async def detailed_health_check():
 app.include_router(bookmark_router)
 app.include_router(get_quotes_router)
 app.include_router(notes_router)
-app.include_router(summary_router)
 app.include_router(auth_router)
 app.include_router(collections_router)
