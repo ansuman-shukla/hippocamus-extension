@@ -14,6 +14,7 @@ export default {
         SansText700:['Sans-Text-700','sans-serif'],
         NanumMyeongjo:['Nanum Myeongjo','sans-serif'],
         rubik:['Rubik','sans-serif'],
+        libreBaskerville:['"Libre Baskerville"','serif'],
       },
       colors: {
         // Greens

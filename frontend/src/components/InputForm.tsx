@@ -108,9 +108,9 @@ export default function InputForm({
       
       {/* Success Message at Top */}
       {!Error && leftBtnTxt === "CLOSE" && (
-        <div className="text-center space-y-2 py-4 mb-4">
-          <h2 className="text-2xl font-bold text-black font-rubik">Successful!</h2>
-          <p className="text-lg text-black font-rubik">Your entry has been saved.</p>
+        <div className="text-left space-y-1 py-4 mb-4">
+          <h2 className="text-[32px] leading-8 text-black font-normal font-rubik">Successful !</h2>
+          <p className="text-[15px] text-black font-rubik">Your entry has been saved.</p>
         </div>
       )}
       {!showNotes ? (<div
