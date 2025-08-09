@@ -2,6 +2,7 @@ fastapi
 uvicorn[standard]
 python-jose[cryptography]
 motor
+pymongo
 requests
 python-dotenv
 pinecone
