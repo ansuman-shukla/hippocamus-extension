@@ -224,7 +224,7 @@ const App = () => {
   return (
     <Router>
       <div className={`flex items-center justify-center bg-transparent ${
-        isPopup ? 'min-h-[500px] w-[419px]' : ''
+        isPopup ? 'min-h-[500px] w-[420px]' : ''
       }`}>
         <AnimatedRoutes />
       </div>

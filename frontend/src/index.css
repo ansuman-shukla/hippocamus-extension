@@ -481,7 +481,21 @@ textarea{
 /* Frame around the extension */
 .extension-frame {
   border: 2px solid #151515;
-  border-radius: 12px;
+  border-radius: 18px;
   overflow: hidden; /* ensure children cannot bleed past rounded corners */
 }
+
+/* Neomorphic embossed headline text for landing page */
+.neo-text-emboss {
+  color: var(--off-white);
+  text-shadow:
+    -8px -8px 12px rgba(255, 255, 255, 0.70),
+    8px 8px 14px rgba(0, 0, 0, 0.22),
+    0 2px 2px rgba(0, 0, 0, 0.18);
+  -webkit-text-stroke: 0.25px rgba(0, 0, 0, 0.08);
+}
+
+/* Enforce requested landing heading weight and size overrides */
+.font-semibold { font-weight: 900 !important; }
+.text-\[42px\] { font-size: 50px !important; line-height: 1.05 !important; }
 

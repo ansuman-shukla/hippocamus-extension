@@ -13,7 +13,7 @@ const AuthLoadingIndicator = ({
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.2, ease: 'easeOut' }}
-      className="h-[500px] w-[100%] relative rounded-lg overflow-hidden bg-[var(--off-white)]"
+      className="h-[500px] w-[420px] relative overflow-hidden extension-frame bg-[var(--off-white)]"
     >
       {/* top-centered message (pushed slightly lower) */}
       <div className="absolute top-10 left-1/2 -translate-x-1/2 w-full text-center px-4">

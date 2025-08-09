@@ -279,7 +279,7 @@ const SearchResponse: React.FC = () => {
   return (
     <div
       style={{ backgroundColor: responseData.length === 0 ? 'var(--primary-red)' : 'var(--off-white)' }}
-      className={`relative max-w-md rounded-lg w-[420px] h-[500px] flex flex-col justify-center extension-frame py-0 overflow-hidden`}>
+      className={`relative max-w-md w-[420px] h-[500px] flex flex-col justify-center extension-frame py-0 overflow-hidden`}>
       {Card.length === 0 ? (
         <div className='text-center px-6'>
           <p className='text-2xl black mb-3 pb-7 nyr-semibold'>
