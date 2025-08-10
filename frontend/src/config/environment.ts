@@ -1,8 +1,8 @@
 // Environment configuration for the application
 export const config = {
-  BACKEND_URL: import.meta.env.VITE_BACKEND_URL,
-  SUPABASE_URL: import.meta.env.VITE_SUPABASE_URL,
-  SUPABASE_ANON_KEY: import.meta.env.VITE_SUPABASE_ANON_KEY,
+  BACKEND_URL: (import.meta.env.VITE_BACKEND_URL || '').trim(),
+  SUPABASE_URL: (import.meta.env.VITE_SUPABASE_URL || '').trim(),
+  SUPABASE_ANON_KEY: (import.meta.env.VITE_SUPABASE_ANON_KEY || '').trim(),
 };
 
 // For use in public scripts (background.js, content.js)

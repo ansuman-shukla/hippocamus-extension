@@ -2,6 +2,7 @@
 // Uses cookie-based authentication handled by backend middleware
 
 import { logout } from './api';
+import { getValidAccessToken } from '../supabaseClient';
 import { config } from '../config/environment';
 
 const getApiBaseUrl = (): string => {
@@ -34,15 +35,16 @@ export const makeRequest = async <T = any>(
   console.log(`   └─ Method: ${options.method || 'GET'}`);
   
   // Get tokens from chrome.storage.local
-  const tokens = await chrome.storage.local.get(["access_token", "refresh_token"]);
-  console.log(`   ├─ Access token present: ${!!tokens.access_token}`);
+  const accessToken = await getValidAccessToken();
+  const tokens = await chrome.storage.local.get(["refresh_token"]);
+  console.log(`   ├─ Access token present: ${!!accessToken}`);
   console.log(`   └─ Refresh token present: ${!!tokens.refresh_token}`);
   
   const defaultOptions: RequestInit = {
     credentials: 'same-origin',
     headers: {
       'Content-Type': 'application/json',
-      ...(tokens.access_token && { 'Authorization': `Bearer ${tokens.access_token}` }),
+      ...(accessToken && { 'Authorization': `Bearer ${accessToken}` }),
       ...options.headers,
     },
     ...options,

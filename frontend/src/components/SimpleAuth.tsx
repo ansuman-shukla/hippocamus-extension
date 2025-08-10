@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { logout, checkAuthStatus } from '../utils/api';
 import { config } from '../config/environment';
+import { supabase, getValidAccessToken, ensureSupabaseSessionFromStoredTokens } from '../supabaseClient';
 
 // Extend Window interface to include our auth check flag
 declare global {
@@ -12,36 +13,8 @@ declare global {
 }
 
 const SUPABASE_URL = config.SUPABASE_URL;
-const SUPABASE_ANON_KEY = config.SUPABASE_ANON_KEY;
 
-// Function to refresh tokens
-async function refreshTokens(refreshToken: string) {
-  const refreshResponse = await fetch(`${SUPABASE_URL}/auth/v1/token?grant_type=refresh_token`, {
-    method: 'POST',
-    headers: {
-      'apikey': SUPABASE_ANON_KEY,
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      refresh_token: refreshToken
-    }),
-  });
-
-  if (!refreshResponse.ok) {
-    const errorData = await refreshResponse.text();
-    throw new Error(`Token refresh failed: ${refreshResponse.status} ${errorData}`);
-  }
-  
-  const newTokens = await refreshResponse.json();
-  
-  // Save both the new access token and refresh token
-  await chrome.storage.local.set({
-    access_token: newTokens.access_token,
-    refresh_token: newTokens.refresh_token || refreshToken
-  });
-  
-  return newTokens;
-}
+// Removed manual refreshTokens; Supabase client will auto-refresh
 
 interface User {
   id: string;
@@ -71,11 +44,14 @@ export function useSimpleAuth() {
     
     window.authChecked = true;
     
-    // Check if user is already logged in on component mount
     const checkUser = async () => {
       console.log('🔍 Checking if user is already logged in...');
       
       try {
+        // Ensure supabase session is initialized from stored tokens (extension env)
+        await ensureSupabaseSessionFromStoredTokens();
+
+        // Let backend validate and also gives us metadata
         const authStatus = await checkAuthStatus();
         console.log('🔍 Auth status response:', authStatus);
         
@@ -91,32 +67,22 @@ export function useSimpleAuth() {
           setUser(profile);
           
         } else if (!authStatus.token_valid && authStatus.has_refresh_token) {
-          console.log('🔄 Token is invalid, but a refresh token is available. Attempting to refresh...');
-          try {
-            await refreshTokens( (await chrome.storage.local.get("refresh_token")).refresh_token );
-            const newAuthStatus = await checkAuthStatus();
-            
-            if (newAuthStatus.is_authenticated) {
-              console.log('✅ Refresh successful, user is now authenticated');
-              const profile = {
-                id: newAuthStatus.user_id,
-                sub: newAuthStatus.user_id,
-                email: newAuthStatus.user_email,
-                full_name: newAuthStatus.full_name || newAuthStatus.user_name,
-                profile_pic: newAuthStatus.picture || newAuthStatus.user_picture
-              };
-              setUser(profile);
-            } else {
-              console.log('❌ Refresh was attempted, but user is still not authenticated. Logging out.');
-              await chrome.storage.local.remove(["access_token", "refresh_token"]);
-              setUser(null);
-            }
-          } catch (refreshError: any) {
-            console.log('❌ Token refresh failed:', refreshError.message);
+          console.log('🔄 Token invalid. Letting Supabase refresh the session...');
+          await getValidAccessToken();
+          const newAuthStatus = await checkAuthStatus();
+          if (newAuthStatus.is_authenticated) {
+            const profile = {
+              id: newAuthStatus.user_id,
+              sub: newAuthStatus.user_id,
+              email: newAuthStatus.user_email,
+              full_name: newAuthStatus.full_name || newAuthStatus.user_name,
+              profile_pic: newAuthStatus.picture || newAuthStatus.user_picture
+            };
+            setUser(profile);
+          } else {
             await chrome.storage.local.remove(["access_token", "refresh_token"]);
             setUser(null);
           }
-          
         } else {
           console.log('❌ No valid session. Tokens will be cleared.');
           await chrome.storage.local.remove(["access_token", "refresh_token"]);
@@ -163,14 +129,19 @@ export function useSimpleAuth() {
         console.log(`   - Refresh Token: ${refreshToken ? refreshToken.substring(0, 20) + '...' : 'Not found'}`);
 
         if (accessToken && refreshToken) {
-          console.log('💾 Storing tokens in chrome.storage.local...');
-          await chrome.storage.local.set({ access_token: accessToken, refresh_token: refreshToken });
-          console.log('✅ Tokens stored successfully');
-          
-          // Set a basic user object to mark as authenticated
-          setUser({ id: 'authenticated', email: '', full_name: 'User' });
-          setError('');
-          resolve({ success: true });
+          console.log('🔐 Setting Supabase session from tokens...');
+          await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          const profileStatus = await checkAuthStatus();
+          if (profileStatus.is_authenticated) {
+            setUser({ id: profileStatus.user_id, email: profileStatus.user_email, full_name: profileStatus.full_name || 'User' });
+            setError('');
+            resolve({ success: true });
+          } else {
+            resolve({ success: false, error: 'Auth validation failed after setting session' });
+          }
         } else {
           console.log('❌ Token extraction failed - missing tokens');
           const errorMsg = "Could not retrieve tokens from Supabase.";

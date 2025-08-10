@@ -104,12 +104,18 @@ async function makeAuthenticatedRequest(url, options, actionName, maxRetries = 3
   
   while (retryCount < maxRetries) {
     try {
+      // Attach Authorization header from stored Supabase session tokens (kept in sync by UI)
+      const tokens = await chrome.storage.local.get(['access_token']);
+      const mergedHeaders = {
+        'Content-Type': 'application/json',
+        ...(tokens && tokens.access_token ? { 'Authorization': `Bearer ${tokens.access_token}` } : {}),
+        ...(options && options.headers ? options.headers : {})
+      };
+      const { headers: _ignored, ...rest } = options || {};
       const response = await fetch(url, {
         credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        ...options
+        ...rest,
+        headers: mergedHeaders
       });
       
       lastStatusCode = response.status;
