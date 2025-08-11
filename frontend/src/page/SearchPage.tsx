@@ -22,6 +22,12 @@ export default function SearchPage({ Quote }: Props) {
     const [rippleColors, setRippleColors] = useState<[string, string]>(["#76ADFF", "#FF8E59"]);
     const [isError, setisError] = useState<boolean>(false);
     const inputRef = useRef<HTMLInputElement>(null);
+    const [tipIndex, setTipIndex] = useState<number>(0);
+    const tipMessages: string[] = [
+        "Add micro-note for better search results.",
+        "Use @collection name to create new collection in note area(e.g, @books)",
+        "Use @collection name to search within a collection (e.g., @ai ChatGPT)",
+    ];
     // Vibrant subset: only greens, yellows, oranges (solid, high-contrast)
     const cardColors = [
         '#39ff88', // neon green
@@ -56,6 +62,14 @@ export default function SearchPage({ Quote }: Props) {
 
     useEffect(() => {
         inputRef.current?.focus();
+    }, []);
+
+    // Rotate inline tips beneath the search box
+    useEffect(() => {
+        const id = window.setInterval(() => {
+            setTipIndex((prev) => (prev + 1) % tipMessages.length);
+        }, 7000);
+        return () => window.clearInterval(id);
     }, []);
 
     const handleSearch = async () => {
@@ -248,13 +262,13 @@ export default function SearchPage({ Quote }: Props) {
                     </div>
                 </div>
 
-                <div className={`font-rubik  text-4xl text-center ${isError ? "text-red-900" : "text-black"}`}>
+                <div className={`font-rubik text-[1.3rem] text-center ${isError ? "text-red-900" : "text-black"}`}>
                     <motion.h1
                         initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ duration: 1.5 }}
-                        className="text-center"
-                    >"{isError ? "The Query must be atleast 3 characters !" : Quote}"</motion.h1>
+                        animate={{ opacity: 0.6 }}
+                        transition={{ duration: 3.5 }}
+                        className="text-center opacity-70"
+                    >{isError ? "The Query must be atleast 3 characters !" : tipMessages[tipIndex] || Quote}</motion.h1>
                 </div>
                 <div className="w-[95%] mx-auto flex justify-between items-center">
                     <Button

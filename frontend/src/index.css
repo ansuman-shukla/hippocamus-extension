@@ -103,6 +103,7 @@
   --peach-pink: #FFABAB;
   --soft-lavender: #C1A2D2;
   --ocean-blue: #2C3E50;
+  --success-yellow: #efff9b;
 }
 .neo-button-variant-save:hover {
   background: #DAEF68 !important;
@@ -498,4 +499,7 @@ textarea{
 /* Enforce requested landing heading weight and size overrides */
 .font-semibold { font-weight: 900 !important; }
 .text-\[42px\] { font-size: 50px !important; line-height: 1.05 !important; }
+
+/* Search page tips size override */
+.text-\[2rem\] { font-size: 1.3rem !important; }
 

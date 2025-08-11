@@ -32,11 +32,11 @@ export default {
         
         // Pinks
         'custom-light-pink': '#ffb1ee',
-        'custom-hot-pink': '#ff7aeb',
+        'custom-hot-pink': '#fea7f1',
         
         // Blues
         'custom-blue': '#007aff',
-        'custom-electric-blue': '#6cacff',
+        'custom-electric-blue': '#9cc7ff',
         'custom-vivid-blue': '#008cff',
         
         // Oranges

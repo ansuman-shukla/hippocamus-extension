@@ -105,7 +105,7 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
           console.log("Frontend received link response:", response);
           
           setIsLoading(false);
-          setbgClr("--primary-green")
+          setbgClr("--success-yellow")
           setLftBtnTxt("CLOSE")
           setBtnTxtClr("--primary-green")
           setRtBtnTxt("HOME")
@@ -137,7 +137,7 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
           console.log("Frontend received note response:", response);
           
           setIsLoading(false);
-          setbgClr("--primary-green")
+          setbgClr("--success-yellow")
           setLftBtnTxt("CLOSE")
           setBtnTxtClr("--primary-green")
           setRtBtnTxt("HOME")

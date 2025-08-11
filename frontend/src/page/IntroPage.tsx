@@ -338,15 +338,16 @@ const Intro = () => {
           <div className="relative h-[500px] w-[420px] flex my-auto justify-center">
             <div className="flex flex-col items-center text-center space-y-8 p-6 mx-6 my-auto rubik">
 
-              <div className="flex items-center mb-16">
-                <span className="neo-text-emboss rubik text-[42px] font-semibold leading-tight select-none">
-                  hippocampus
-                </span>
+              <div className="w-full text-left space-y-2">
+                <p className="text-[30px] text-[#151515] rubik pb-[0.3rem]">Hey,</p>
+                <p className="rubik text-[18px] leading-relaxed text-[#151515] max-w-md pb-10">
+                  I’m <span className="font-bold bg-yellow-300/40 px-1 mx-1 rounded">HippoCampus</span>, and from now on, I’ll help you
+                  <span className="font-bold bg-yellow-300/40 px-1 mx-1 rounded">save</span>
+                  anything online — and
+                  <span className="font-bold bg-yellow-300/40 px-1 mx-1 rounded">find</span>
+                  it for you whenever you need it. You’ll never lose anything important again.
+                </p>
               </div>
-
-              <p className="text-4xl rubik max-w-md">
-                "Every bookmark is a doorway to a new journey"
-              </p>
 
               {error && (
                 <div className="text-red-500 text-sm max-w-md">
@@ -354,7 +355,7 @@ const Intro = () => {
                 </div>
               )}
 
-              <StyledWrapper>
+              <StyledWrapper className="mt-16">
                 <button className="uiverse rubik" onClick={handleAuth}>
                   <div className="wrapper">
                     <span>Get Started</span>

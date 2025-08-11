@@ -222,7 +222,7 @@ export const submitLink = async (data: any) => {
   return api.post('/links/save', data);
 };
 
-export const saveNotes = async (data: { title: string; note: string }) => {
+export const saveNotes = async (data: { title: string; note: string; collection?: string }) => {
   console.log('📝 API CLIENT: Saving notes data');
   return api.post('/notes/', data);
 };

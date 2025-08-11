@@ -25,29 +25,21 @@ const SearchResponse: React.FC = () => {
   const notesArray = location.state?.notesArray || [];
 
   const colors = [
-    'bg-custom-orange',
     'bg-custom-light-violet',
-    'bg-custom-lime',
     'bg-custom-hot-pink',
 
     'bg-custom-electric-blue',
     'bg-custom-marigold',
     'bg-custom-bright-purple',
-    'bg-custom-neon-green',
 
-    'bg-custom-bright-orange',
-    'bg-custom-vivid-blue',
     'bg-custom-lime-yellow',
     'bg-custom-violet',
 
-    'bg-custom-chartreuse',
     'bg-custom-light-pink',
     'bg-custom-electric-lime',
-    'bg-custom-blue',
 
     'bg-custom-brownish-orange',
     'bg-custom-green',
-    'bg-custom-bright-yellow',
     'bg-custom-yellow'
   ];
 
@@ -93,36 +85,6 @@ const SearchResponse: React.FC = () => {
         console.error("chrome.bookmarks API is not available.");
         return;
       }
-
-      // chrome.bookmarks.getTree((bookmarkTreeNodes) => {
-      //     const allBookmarks: Array<{ url: string, title: string }> = [];
-
-      //     const extractBookmarks = (nodes: chrome.bookmarks.BookmarkTreeNode[]) => {
-      //         for (const node of nodes) {
-      //             if (node.url) {
-      //                 const url = node.url;
-      //                 allBookmarks.push({
-      //                     url: node.url,
-      //                     title: node.title || url.split("/").pop() || url 
-      //                 });
-      //             }
-      //             if (node.children) extractBookmarks(node.children);
-      //         }
-      //     };
-
-      //     extractBookmarks(bookmarkTreeNodes);
-
-      //     const newCards = allBookmarks.map((item, index) => ({
-      //         key: Card.length + index + 1,
-      //         title: item.title, 
-      //         fullDescription: item.url,
-      //         bgColor: randomColor()
-      //     }));
-
-      //     setCards(prev => [...prev, ...newCards]);
-
-
-      // });
 
       if (responseData) {
         if (responseData.length === 0) {

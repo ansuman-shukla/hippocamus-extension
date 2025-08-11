@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Button from "./Button";
 import SavingLoader from "./SavingLoader";
  
@@ -46,6 +46,7 @@ export default function InputForm({
   NotesTitle,
   setNotesTitle,
   setCurrentTab,
+  currentTab,
   selectedCollection,
   setSelectedCollection
 }: Props) {
@@ -53,6 +54,11 @@ export default function InputForm({
   const notesTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const titleTextAreaRef = useRef<HTMLTextAreaElement>(null);
   const bookmarkNoteRef = useRef<HTMLTextAreaElement>(null);
+  const [submitPlaceholderIndex, setSubmitPlaceholderIndex] = useState<number>(0);
+  const submitPlaceholders = [
+    "Add micro-note for better search results (press Enter to save)",
+    "Tip: Use @collection to create/save to a collection (e.g., @books)"
+  ];
   
   // Auto-focus on bookmark note area when extension opens (default behavior)
   useEffect(() => {
@@ -86,14 +92,40 @@ export default function InputForm({
     }
   },[showNotes])
 
+  // Real-time sync: update selectedCollection from @pattern typed in note fields
+  useEffect(() => {
+    if (isLoading || showOnlyOne) return;
+    const sourceText = (typeof currentTab === 'string' && currentTab === 'notes') ? extraNote : formData?.note;
+    const text = typeof sourceText === 'string' ? sourceText : '';
+    const match = text.match(/@([a-zA-Z0-9_-]*)/);
+    if (match) {
+      const partial = (match[1] || '').toLowerCase();
+      if (partial !== selectedCollection) {
+        setSelectedCollection(partial);
+      }
+    }
+  }, [currentTab, extraNote, formData?.note, isLoading, showOnlyOne, selectedCollection, setSelectedCollection]);
+
+  // Rotate submit form placeholder between default and @collection tip
+  useEffect(() => {
+    if (isLoading || showOnlyOne) return;
+    // Only relevant for the submit form (when not showing notes UI)
+    if (!showNotes) {
+      const intervalId = window.setInterval(() => {
+        setSubmitPlaceholderIndex((prev) => (prev + 1) % submitPlaceholders.length);
+      }, 7000);
+      return () => window.clearInterval(intervalId);
+    }
+  }, [isLoading, showOnlyOne, showNotes]);
+
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       {/* Error Message at Top */}
       {Error && (
-        <div className="text-center space-y-2 py-4 mb-4">
-          <h2 className="text-2xl font-bold text-black font-rubik">Error!</h2>
-          <p className="text-lg text-black font-rubik">{Error}</p>
+        <div className="text-center space-y-2 py-4 mb-4 bg-[#efff9b]">
+          <h2 className="text-[27px] text-black font-rubik" style={{ fontWeight: 500 }}>Error!</h2>
+          <p className="text-lg text-black font-rubik" style={{ fontWeight: 600 }}>{Error}</p>
         </div>
       )}
       
@@ -108,9 +140,9 @@ export default function InputForm({
       
       {/* Success Message at Top */}
       {!Error && leftBtnTxt === "CLOSE" && (
-        <div className="text-left space-y-1 py-4 mb-4">
-          <h2 className="text-[32px] leading-8 text-black font-normal font-rubik">Successful !</h2>
-          <p className="text-[15px] text-black font-rubik">Your entry has been saved.</p>
+        <div className="text-left space-y-1 py-4 mb-4 bg-[#efff9b]">
+          <h2 className="text-[27px] leading-8 text-black font-rubik" style={{ fontWeight: 500 }}>Successful !</h2>
+          <p className="text-[15px] text-black font-rubik" style={{ fontWeight: 600 }}>Your entry has been saved.</p>
         </div>
       )}
       {!showNotes ? (<div
@@ -162,7 +194,7 @@ export default function InputForm({
               }
             }}
             className="w-full text-[15px] border-b border-black bg-transparent focus:outline-none placeholder-[#151515] placeholder-opacity-25 py-1 scrollbar-hide"
-            placeholder="Add micro-note for better search results (press Enter to save)"
+            placeholder={submitPlaceholders[submitPlaceholderIndex]}
             disabled={isLoading || leftBtnTxt === "CLOSE"}
 
 />
