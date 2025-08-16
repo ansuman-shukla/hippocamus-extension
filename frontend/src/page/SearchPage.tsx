@@ -32,7 +32,6 @@ export default function SearchPage({ Quote }: Props) {
     const cardColors = [
         '#39ff88', // neon green
         '#48f08b', // green
-        '#d7ff40', // electric lime
         '#ff7b00', // bright orange
         '#ff8e59', // orange
         '#ffba00', // marigold

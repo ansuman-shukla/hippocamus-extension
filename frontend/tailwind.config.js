@@ -21,7 +21,7 @@ export default {
         'custom-lime': '#e5ff59',
         'custom-green': '#48f08b',
         'custom-lime-yellow': '#daef68',
-        'custom-electric-lime': '#d7ff40',
+        // 'custom-electric-lime': '#d7ff40', // removed per request
         'custom-neon-green': '#39ff88',
         'custom-chartreuse': '#dfff00',
         

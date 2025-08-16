@@ -16,7 +16,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children }) => {
   if (isLoading) {
     console.log('⏳ PROTECTED_ROUTE: Still loading auth status');
     return (
-      <AuthLoadingIndicator message="Hold on" />
+      <AuthLoadingIndicator message="" />
     );
   }
 

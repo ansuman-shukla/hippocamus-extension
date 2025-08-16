@@ -406,7 +406,7 @@ textarea{
 
 .neo-dropdown-trigger {
   background: #ffffff;
-  border-radius: 9999px;
+  border-radius: 150px;
   border: none;
   box-shadow:
     6px 6px 12px rgba(0,0,0,0.12),

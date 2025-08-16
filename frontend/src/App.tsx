@@ -199,7 +199,7 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
   if (isLoading) {
     return (
       <AuthLoadingIndicator 
-        message="Hold on"
+        message=""
       />
     );
   }

@@ -226,44 +226,7 @@ chrome.action.onClicked.addListener((tab) => {
 
 console.log('✅ BACKGROUND: chrome.action.onClicked listener registered successfully');
 
-// MANUAL TEST: Add a context menu item to test if background script is working
-chrome.runtime.onInstalled.addListener(() => {
-  chrome.contextMenus.create({
-    id: "test-background-script",
-    title: "Open HippoCampus",
-    contexts: ["page"]
-  });
-});
-
-// Handle context menu clicks (this tests if background script is responsive)
-chrome.contextMenus.onClicked.addListener((info, tab) => {
-  if (info.menuItemId === "test-background-script") {
-    console.log('🧪 BACKGROUND: Manual test triggered via context menu');
-    console.log('   ├─ This confirms the background script is active and responsive');
-    console.log('   ├─ Now manually executing the same logic as Alt+M shortcut');
-    
-    // Manually execute the same CSS injection and script execution as Alt+M
-    console.log('🎨 BACKGROUND TEST: Injecting CSS styles into target tab');
-    chrome.scripting.insertCSS({
-      target: { tabId: tab.id },
-      files: ["content.css"]
-    }).then(() => {
-      console.log('✅ BACKGROUND TEST: CSS injection completed successfully');
-    }).catch((error) => {
-      console.error('❌ BACKGROUND TEST: CSS injection failed:', error);
-    });
-
-    console.log('📜 BACKGROUND TEST: Executing content script in target tab');
-    chrome.scripting.executeScript({
-      target: { tabId: tab.id },
-      files: ["content.js"]
-    }).then(() => {
-      console.log('✅ BACKGROUND TEST: Content script execution completed successfully');
-    }).catch((error) => {
-      console.error('❌ BACKGROUND TEST: Content script execution failed:', error);
-    });
-  }
-});
+// Removed context menu test code to drop the contextMenus permission
 
 // KEYBOARD SHORTCUT COMMAND HANDLER
 chrome.commands.onCommand.addListener((command, tab) => {
