@@ -48,11 +48,11 @@ export async function checkAuthStatus() {
         // Add frontend refresh token info since backend doesn't receive it
         data.has_refresh_token = !!tokens.refresh_token;
         
-        console.log('🔍 checkAuthStatus: Response received:', response.status);
+        // console.log('🔍 checkAuthStatus: Response received:', response.status);
         return data;
         
     } catch (error: any) {
-        console.log('🔍 checkAuthStatus: Network error:', error.message);
+        // console.log('🔍 checkAuthStatus: Network error:', error.message);
         return {
             has_access_token: true,
             has_refresh_token: !!tokens.refresh_token,

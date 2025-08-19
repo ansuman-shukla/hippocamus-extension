@@ -316,14 +316,14 @@ const Intro = () => {
     const [error, setError] = useState('');
 
     const handleAuth = async () => {
-        console.log('🚀 Initiating simplified authentication');
+        // console.log('🚀 Initiating simplified authentication');
         setError(''); // Clear any previous errors
         
         const result = await login();
         if (result.success) {
             Navigate("/submit");
         } else {
-            console.error('❌ Login failed:', result.error);
+            // console.error('❌ Login failed:', result.error);
             setError(result.error || 'Authentication failed');
         }
     };

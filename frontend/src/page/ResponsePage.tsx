@@ -30,7 +30,7 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
   const isNavigating = useRef(false);
 
   function isValidURL(url:string) {
-        console.log("The url is:", url ,"and it is valid", isUrlHttp(url));
+        // console.log("The url is:", url ,"and it is valid", isUrlHttp(url));
         return !isUrlHttp(url);
   }
 
@@ -100,9 +100,9 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
             // If @collection already exists in note, prioritize that over dropdown selection
           }
           
-          console.log("Frontend submitting link data:", finalFormData);
-          const response = await submitLink(finalFormData);
-          console.log("Frontend received link response:", response);
+          // console.log("Frontend submitting link data:", finalFormData);
+          await submitLink(finalFormData);
+          // console.log("Frontend received link response:", response);
           
           setIsLoading(false);
           setbgClr("--success-yellow")
@@ -132,9 +132,9 @@ const [leftBtnTxt, setLftBtnTxt] = useState("SEARCH");
             collection: collectionForAPI || undefined
           };
           
-          console.log("Frontend submitting note data:", noteData);
-          const response = await saveNotes(noteData);
-          console.log("Frontend received note response:", response);
+          // console.log("Frontend submitting note data:", noteData);
+          await saveNotes(noteData);
+          // console.log("Frontend received note response:", response);
           
           setIsLoading(false);
           setbgClr("--success-yellow")

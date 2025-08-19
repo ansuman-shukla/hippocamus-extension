@@ -45,35 +45,20 @@ const AnimatedRoutes = () => {
   const [quotes, setQuotes] = useState<string[]>([]);
 const { loading: isLoading, isAuthenticated } = useSimpleAuth();
 
-  // Keyboard shortcut handler for Alt+X (when extension is already open)
+  // Message listener for focus requests from content script
   useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      // Check for Alt+X combination
-      if (event.altKey && event.key.toLowerCase() === 'x') {
-        event.preventDefault(); // Prevent default browser action for Alt+X
-        console.log('🔍 APP: Alt+X shortcut triggered, navigating to search page');
-        
-        // Navigate to search page (extension is already open)
-        Navigate("/search");
-      }
-    };
-
-    // Message listener for focus requests from content script
     const handleMessage = (event: MessageEvent) => {
       if (event.data && event.data.action === "focusSearch") {
-        console.log('🔍 APP: Focus search message received from content script');
+        // console.log('🔍 APP: Focus search message received from content script');
         Navigate("/search");
       }
-      
     };
 
-    // Add event listeners
-    document.addEventListener('keydown', handleKeyDown);
+    // Add event listener
     window.addEventListener('message', handleMessage);
 
-    // Cleanup function to remove event listeners
+    // Cleanup function to remove event listener
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
       window.removeEventListener('message', handleMessage);
     };
   }, [Navigate]);
@@ -101,15 +86,15 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
         });
 
         if (cookie && location.pathname === "/") {
-          console.log('🔍 APP: Backend cookies found in handleAuthFlow - useAuth will handle validation');
+          // console.log('🔍 APP: Backend cookies found in handleAuthFlow - useAuth will handle validation');
           // Let useAuth hook handle validation to avoid duplicate calls
         }
 
         // Load quotes from localStorage or fetch from backend
         if(localStorage.getItem("quotes")){
-          console.log("found Quotes")
+          // console.log("found Quotes")
           setQuotes(JSON.parse(localStorage.getItem("quotes") || "[]"));
-          console.log("have set the quotes")
+          // console.log("have set the quotes")
         }else{
           const fetchQuotes = async (retryCount = 0) => {
             try {
@@ -119,9 +104,9 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
                 setQuotes(prev => [
                   ...new Set([...prev, ...filteredQuotes])
                 ]);
-                console.log("GOT QUOTES FROM BACKEND")
+                // console.log("GOT QUOTES FROM BACKEND")
                 localStorage.setItem("quotes", JSON.stringify(filteredQuotes));
-                console.log("Quotes are set")
+                // console.log("Quotes are set")
               } else {
                 console.error("Response data is not an array:", quotesData);
               }
@@ -129,7 +114,7 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
               console.error("Failed to get quotes:", error?.message || "No response");
               // Retry up to 2 times with increasing delay for new users
               if (retryCount < 2) {
-                console.log(`Retrying quotes fetch in ${(retryCount + 1) * 1000}ms...`);
+                // console.log(`Retrying quotes fetch in ${(retryCount + 1) * 1000}ms...`);
                 setTimeout(() => fetchQuotes(retryCount + 1), (retryCount + 1) * 1000);
               }
             }
@@ -154,15 +139,15 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
           changeInfo.cookie.domain.includes(new URL(config.BACKEND_URL as string).hostname)) {
         
         if (changeInfo.removed) {
-          console.log('🚫 APP: Backend access token was removed, checking if we need to redirect to auth');
+          // console.log('🚫 APP: Backend access token was removed, checking if we need to redirect to auth');
           
           // Check if we're on a protected page and should redirect to intro/auth
           if (location.pathname === "/submit" || location.pathname === "/search" || location.pathname === "/response") {
-            console.log('🔄 APP: User was on protected page, redirecting to intro for re-authentication');
+            // console.log('🔄 APP: User was on protected page, redirecting to intro for re-authentication');
             Navigate("/");
           }
         } else {
-          console.log('🔑 APP: Backend access token detected, user may have authenticated');
+          // console.log('🔑 APP: Backend access token detected, user may have authenticated');
           // Token was added, but don't auto-navigate - let existing auth flow handle it
         }
       }
@@ -171,8 +156,8 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
     // Listen for background script auth failure notifications
     const handleBackgroundMessage = (message: any, _sender: any, sendResponse: any) => {
       if (message.action === "authenticationFailed") {
-        console.log('🚫 APP: Received authentication failure notification from background script');
-        console.log('🔄 APP: Redirecting to intro page for re-authentication');
+        // console.log('🚫 APP: Received authentication failure notification from background script');
+        // console.log('🔄 APP: Redirecting to intro page for re-authentication');
         Navigate("/");
         sendResponse({ received: true });
       }
@@ -190,7 +175,7 @@ const { loading: isLoading, isAuthenticated } = useSimpleAuth();
   // Navigation effect based on auth state
   useEffect(() => {
     if (!isLoading && isAuthenticated && location.pathname === "/") {
-      console.log('🎯 APP: User is authenticated, redirecting to submit page');
+      // console.log('🎯 APP: User is authenticated, redirecting to submit page');
       Navigate("/submit");
     }
   }, [isLoading, isAuthenticated, location.pathname, Navigate]);

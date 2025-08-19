@@ -74,15 +74,15 @@ export default function SearchPage({ Quote }: Props) {
     const handleSearch = async () => {
         setIsLoading(true);
         try {
-            console.log('🔍 SEARCH: Starting search request via apiClient');
-            console.log('📝 SEARCH: Original query:', query);
+            // console.log('🔍 SEARCH: Starting search request via apiClient');
+            // console.log('📝 SEARCH: Original query:', query);
             
             // Extract collection from query using @collection syntax
             const extractedCollection = extractCollectionFromText(query);
             const cleanedQuery = removeCollectionPattern(query);
             
-            console.log('🔍 SEARCH: Extracted collection:', extractedCollection);
-            console.log('🧹 SEARCH: Cleaned query:', cleanedQuery);
+            // console.log('🔍 SEARCH: Extracted collection:', extractedCollection);
+            // console.log('🧹 SEARCH: Cleaned query:', cleanedQuery);
             
             const requestBody: any = {
                 query: cleanedQuery
@@ -91,20 +91,20 @@ export default function SearchPage({ Quote }: Props) {
             // Only use collection filtering (tab filtering disabled)
             if (extractedCollection) {
                 requestBody.filter = { collection: { $eq: extractedCollection } };
-                console.log('🎯 SEARCH: Adding collection filter:', extractedCollection);
+                // console.log('🎯 SEARCH: Adding collection filter:', extractedCollection);
             }
             
-            console.log('📤 SEARCH: Final request body being sent:', JSON.stringify(requestBody, null, 2));
+            // console.log('📤 SEARCH: Final request body being sent:', JSON.stringify(requestBody, null, 2));
 
             const response = await api.post('/links/search', requestBody);
             
-            console.log('📥 SEARCH: Response received:', response);
+            // console.log('📥 SEARCH: Response received:', response);
             
             if (response?.detail === "Search failed: No documents found matching query") {
                 Navigate("/response", { state: { data: [] } });
                 return;
             } else {
-                console.log("The response is:", response);
+                // console.log("The response is:", response);
                 const responseArray = response.map((item: any) => ({
                     title: item.metadata.title,
                     url: item.metadata.source_url,
@@ -116,7 +116,7 @@ export default function SearchPage({ Quote }: Props) {
                 Navigate("/response", { state: { data: responseArray, Query: query } });
             }
         } catch (error: any) {
-            console.log("Search completed with no results:", error?.message);
+            // console.log("Search completed with no results:", error?.message);
             
             // Handle 404 or "No documents found" as normal no results case
             if (error?.status === 404 || error?.message?.includes("No documents found matching query")) {
@@ -131,7 +131,7 @@ export default function SearchPage({ Quote }: Props) {
     const handleSearchAll = async () => {
         setIsLoading(true);
         try {
-            console.log('🔍 SEARCH: Starting searchAll request via apiClient');
+            // console.log('🔍 SEARCH: Starting searchAll request via apiClient');
             
             // Make both API calls in parallel
             const [linksData, notesData] = await Promise.all([
@@ -139,8 +139,8 @@ export default function SearchPage({ Quote }: Props) {
                 api.get('/notes/')
             ]);
             
-            console.log('📦 SEARCH: Links data received via apiClient');
-            console.log('📦 SEARCH: Notes data received via apiClient');
+            // console.log('📦 SEARCH: Links data received via apiClient');
+            // console.log('📦 SEARCH: Notes data received via apiClient');
             
             const linksArray = linksData.map((item: any) => ({
                 title: item.title,
@@ -158,8 +158,8 @@ export default function SearchPage({ Quote }: Props) {
                 type: item.type
             }));
             
-            console.log("The links array is from search all: ", linksArray);
-            console.log("The notes array is from search all:", notesArray);
+            // console.log("The links array is from search all: ", linksArray);
+            // console.log("The notes array is from search all:", notesArray);
             const responseArray = [...linksArray, ...notesArray];
             Navigate("/response", { state: {data: responseArray, Query: " ", isSearchAll:true} });
             
@@ -179,7 +179,7 @@ export default function SearchPage({ Quote }: Props) {
             );
             
             if (isAuthError) {
-                console.log("🚫 SEARCH: Authentication error detected, redirecting to intro page");
+                // console.log("🚫 SEARCH: Authentication error detected, redirecting to intro page");
                 Navigate("/");
                 return;
             }
@@ -221,7 +221,7 @@ export default function SearchPage({ Quote }: Props) {
                         <input
                             ref={inputRef}
                             type="text"
-                            placeholder="SEARCH BOOKMARKS & NOTES - PRESS ENTER"
+                            placeholder="Put your query, then hit Enter"
                             value={query}
                             onChange={(e) => {
                                 setQuery(e.target.value);

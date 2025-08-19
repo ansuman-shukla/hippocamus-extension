@@ -76,13 +76,13 @@ const SearchResponse: React.FC = () => {
   const allBookmarks: string[] = [];
 
   useEffect(()=>{
-    console.log("The active tab is:", activeTab);
+    // console.log("The active tab is:", activeTab);
   },[activeTab])
 
   useEffect(() => {
     const getAllBookmarks = () => {
       if (!chrome.bookmarks) {
-        console.error("chrome.bookmarks API is not available.");
+        // console.error("chrome.bookmarks API is not available.");
         return;
       }
 
@@ -90,8 +90,8 @@ const SearchResponse: React.FC = () => {
         if (responseData.length === 0) {
           return;
         }
-        console.log("The query is:", query);
-        console.log("The responseData items:", responseData);
+        // console.log("The query is:", query);
+        // console.log("The responseData items:", responseData);
         const newCards = responseData.map((item: any, index: number) => ({
           key: Card.length + index + 1,
           title: item.title,
@@ -115,11 +115,11 @@ const SearchResponse: React.FC = () => {
         }
 
         ));
-        console.log("The newCards after mapping:", newCards);
+        // console.log("The newCards after mapping:", newCards);
         setCards(newCards);
       }else if(linksArray && notesArray){
-        console.log("The links array is:", linksArray);
-        console.log("The notes array is:", notesArray);
+        // console.log("The links array is:", linksArray);
+        // console.log("The notes array is:", notesArray);
         const newCards = [...linksArray, ...notesArray].map((item: any, index: number) => ({
           key: Card.length + index + 1,
           title: item.title,
@@ -141,7 +141,7 @@ const SearchResponse: React.FC = () => {
         }
 
         ));
-        console.log("The newCards from linksArray/notesArray:", newCards);
+        // console.log("The newCards from linksArray/notesArray:", newCards);
         setCards(newCards);
       }
 
@@ -155,22 +155,22 @@ const SearchResponse: React.FC = () => {
         const lowerQuery = query.toLowerCase();
 
         const extractAndFilter = (nodes: chrome.bookmarks.BookmarkTreeNode[]) => {
-          const allBrowserBookmarks = nodes.map((node) => ({
-            url: node.url,
-            title: node.title || node.url && node.url.split("/").pop() || node.url
-          }));
-          console.log("All bookmarks from chrome: ", allBrowserBookmarks);
+          // const allBrowserBookmarks = nodes.map((node) => ({
+          //   url: node.url,
+          //   title: node.title || node.url && node.url.split("/").pop() || node.url
+          // }));
+          // console.log("All bookmarks from chrome: ", allBrowserBookmarks);
           for (const node of nodes) {
             if (node.url && (
               node.title.toLowerCase().includes(lowerQuery) ||
               node.url.toLowerCase().includes(lowerQuery)
             )) {
-              console.log("the node is after checking  :", node)
+              // console.log("the node is after checking  :", node)
               matches.push({
                 url: node.url,
                 title: node.title || node.url.split("/").pop() || node.url
               });
-              console.log("now the matches are:", matches);
+              // console.log("now the matches are:", matches);
             }
             if (node.children) extractAndFilter(node.children);
           }
@@ -188,19 +188,19 @@ const SearchResponse: React.FC = () => {
 
 
   useEffect(() => {
-    console.log("Filtered browser bookmarks: ", filteredBrowserBookmarks);
+    // console.log("Filtered browser bookmarks: ", filteredBrowserBookmarks);
   }, [filteredBrowserBookmarks]);
 
   const handleDelete = async () => {
     setIsLoading(true);
     if (selectedIndex !== null) {
       const cardToDelete = Card[selectedIndex];
-      console.log("=== DELETE DEBUG ===");
-      console.log("selectedIndex:", selectedIndex);
-      console.log("cardToDelete:", cardToDelete);
-      console.log("cardToDelete.ID:", cardToDelete.ID);
-      console.log("Card array:", Card);
-      console.log("==================");
+      // console.log("=== DELETE DEBUG ===");
+      // console.log("selectedIndex:", selectedIndex);
+      // console.log("cardToDelete:", cardToDelete);
+      // console.log("cardToDelete.ID:", cardToDelete.ID);
+      // console.log("Card array:", Card);
+      // console.log("==================");
       
       const isNote = cardToDelete.type === "Note";
       
@@ -218,9 +218,9 @@ const SearchResponse: React.FC = () => {
         setIsLoading(false);
         setConfirmDelete(true);
         
-        console.log(`Successfully deleted ${isNote ? 'note' : 'bookmark'}:`, cardToDelete);
+        // console.log(`Successfully deleted ${isNote ? 'note' : 'bookmark'}:`, cardToDelete);
       } catch (error: any) {
-        console.error("Delete failed:", error);
+        // console.error("Delete failed:", error);
         setDeleteSuccess(false);
         setIsLoading(false);
         setConfirmDelete(true);

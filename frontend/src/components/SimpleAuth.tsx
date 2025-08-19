@@ -37,7 +37,7 @@ export function useSimpleAuth() {
   useEffect(() => {
     // Prevent duplicate auth checks by using a global flag
     if (window.authChecked) {
-      console.log('🔍 Auth check already performed, skipping duplicate check');
+      // console.log('🔍 Auth check already performed, skipping duplicate check');
       setLoading(false);
       return;
     }
@@ -45,7 +45,7 @@ export function useSimpleAuth() {
     window.authChecked = true;
     
     const checkUser = async () => {
-      console.log('🔍 Checking if user is already logged in...');
+      // console.log('🔍 Checking if user is already logged in...');
       
       try {
         // Ensure supabase session is initialized from stored tokens (extension env)
@@ -53,10 +53,10 @@ export function useSimpleAuth() {
 
         // Let backend validate and also gives us metadata
         const authStatus = await checkAuthStatus();
-        console.log('🔍 Auth status response:', authStatus);
+        // console.log('🔍 Auth status response:', authStatus);
         
         if (authStatus.is_authenticated && authStatus.token_valid) {
-          console.log('✅ User is authenticated and token is valid');
+          // console.log('✅ User is authenticated and token is valid');
           const profile = {
             id: authStatus.user_id,
             sub: authStatus.user_id,
@@ -67,7 +67,7 @@ export function useSimpleAuth() {
           setUser(profile);
           
         } else if (!authStatus.token_valid && authStatus.has_refresh_token) {
-          console.log('🔄 Token invalid. Letting Supabase refresh the session...');
+          // console.log('🔄 Token invalid. Letting Supabase refresh the session...');
           await getValidAccessToken();
           const newAuthStatus = await checkAuthStatus();
           if (newAuthStatus.is_authenticated) {
@@ -84,13 +84,13 @@ export function useSimpleAuth() {
             setUser(null);
           }
         } else {
-          console.log('❌ No valid session. Tokens will be cleared.');
+          // console.log('❌ No valid session. Tokens will be cleared.');
           await chrome.storage.local.remove(["access_token", "refresh_token"]);
           setUser(null);
         }
         
       } catch (e: any) {
-        console.log('❌ Auth check failed (outer catch):', e.message);
+        // console.log('❌ Auth check failed (outer catch):', e.message);
         setUser(null);
         
       } finally {
@@ -110,26 +110,26 @@ export function useSimpleAuth() {
         interactive: true,
       }, async (redirectedTo) => {
         if (chrome.runtime.lastError || !redirectedTo) {
-          console.log('❌ Login failed:', chrome.runtime.lastError?.message || 'Please try again.');
+          // console.log('❌ Login failed:', chrome.runtime.lastError?.message || 'Please try again.');
           const errorMsg = "Login failed. " + (chrome.runtime.lastError?.message || "Please try again.");
           setError(errorMsg);
           resolve({ success: false, error: errorMsg });
           return;
         }
         
-        console.log('🔗 Redirect URL received:', redirectedTo);
+        // console.log('🔗 Redirect URL received:', redirectedTo);
         
         const url = new URL(redirectedTo);
         const fragment = new URLSearchParams(url.hash.substring(1));
         const accessToken = fragment.get('access_token');
         const refreshToken = fragment.get('refresh_token');
         
-        console.log('🔑 Token extraction results:');
-        console.log(`   - Access Token: ${accessToken ? accessToken.substring(0, 20) + '...' : 'Not found'}`);
-        console.log(`   - Refresh Token: ${refreshToken ? refreshToken.substring(0, 20) + '...' : 'Not found'}`);
+        // console.log('🔑 Token extraction results:');
+        // console.log(`   - Access Token: ${accessToken ? accessToken.substring(0, 20) + '...' : 'Not found'}`);
+        // console.log(`   - Refresh Token: ${refreshToken ? refreshToken.substring(0, 20) + '...' : 'Not found'}`);
 
         if (accessToken && refreshToken) {
-          console.log('🔐 Setting Supabase session from tokens...');
+          // console.log('🔐 Setting Supabase session from tokens...');
           await supabase.auth.setSession({
             access_token: accessToken,
             refresh_token: refreshToken
@@ -143,7 +143,7 @@ export function useSimpleAuth() {
             resolve({ success: false, error: 'Auth validation failed after setting session' });
           }
         } else {
-          console.log('❌ Token extraction failed - missing tokens');
+          // console.log('❌ Token extraction failed - missing tokens');
           const errorMsg = "Could not retrieve tokens from Supabase.";
           setError(errorMsg);
           resolve({ success: false, error: errorMsg });

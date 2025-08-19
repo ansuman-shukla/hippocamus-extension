@@ -34,7 +34,7 @@ export default function CollectionsDropdown({
         
         // Use apiClient for authenticated requests
         const collectionsData: Collection[] = await getCollections();
-        console.log('📚 COLLECTIONS DROPDOWN: Fetched collections:', collectionsData);
+        // console.log('📚 COLLECTIONS DROPDOWN: Fetched collections:', collectionsData);
         
         // Sort collections by memory_count in descending order
         const sortedCollections = collectionsData.sort((a, b) => b.memory_count - a.memory_count);
@@ -45,13 +45,13 @@ export default function CollectionsDropdown({
           onSelectionChange(sortedCollections[0].name);
         }
       } catch (error: any) {
-        console.error('📚 COLLECTIONS DROPDOWN: Error fetching collections:', error);
+        // console.error('📚 COLLECTIONS DROPDOWN: Error fetching collections:', error);
         
         // Handle different error types gracefully
         if (error.status === 401) {
-          console.log('📚 COLLECTIONS DROPDOWN: Unauthorized, user needs to login');
+          // console.log('📚 COLLECTIONS DROPDOWN: Unauthorized, user needs to login');
         } else if (error.status === 404) {
-          console.log('📚 COLLECTIONS DROPDOWN: No collections endpoint found');
+          // console.log('📚 COLLECTIONS DROPDOWN: No collections endpoint found');
         }
         
         setCollections([]);

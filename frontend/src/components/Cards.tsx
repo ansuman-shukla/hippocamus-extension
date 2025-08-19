@@ -25,7 +25,7 @@ activeTab,
 isSearchAll
 
  }: CardProps) {
-  console.log("The type is:", type);
+  // console.log("The type is:", type);
 
     return (
         <>

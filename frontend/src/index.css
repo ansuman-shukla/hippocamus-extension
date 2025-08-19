@@ -124,6 +124,10 @@
 }
 
 /* Additional page-specific variants */
+.neo-button-variant-back {
+  background: #fff !important;
+  color: #151515 !important;
+}
 .neo-button-variant-home:hover {
   background: #ffce00 !important;
   color: #151515 !important;
@@ -134,10 +138,10 @@
 }
 
 .neo-button-variant-back:hover {
-  background: #F07A35 !important; /* darker shade of #FF8E59 */
-  color: #151515 !important;
+  background: #414445 !important;
+  color: #fff !important;
   box-shadow:
-    0 0 12px 3px rgba(240, 122, 53, 0.85),
+    0 0 12px 3px rgba(65, 68, 69, 0.85),
     6px 6px 12px rgba(0,0,0,0.12),
     -4px -4px 10px rgba(255,255,255,0.9);
 }

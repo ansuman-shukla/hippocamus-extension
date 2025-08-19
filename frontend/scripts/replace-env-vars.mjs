@@ -9,8 +9,8 @@ config();
 
 const BACKEND_URL = process.env.VITE_BACKEND_URL;
 
-console.log('Replacing environment variables in public files...');
-console.log('BACKEND_URL:', BACKEND_URL);
+// console.log('Replacing environment variables in public files...');
+// console.log('BACKEND_URL:', BACKEND_URL);
 
 // Update background.js
 const backgroundPath = path.join(process.cwd(), 'dist', 'background.js');
@@ -30,7 +30,7 @@ if (existsSync(backgroundPath)) {
   );
   
   writeFileSync(backgroundPath, backgroundContent);
-  console.log('✓ Updated background.js with all environment variables');
+  // console.log('✓ Updated background.js with all environment variables');
 }
 
 // Update manifest.json
@@ -57,7 +57,7 @@ if (existsSync(manifestPath)) {
   }
 
   writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
-  console.log('✓ Updated manifest.json');
+  // console.log('✓ Updated manifest.json');
 }
 
-console.log('Environment variable replacement completed!');
+// console.log('Environment variable replacement completed!');

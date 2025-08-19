@@ -6,7 +6,7 @@ const SUPABASE_KEY = config.SUPABASE_ANON_KEY as string;
 
 
 
-console.log(SUPABASE_KEY , SUPABASE_URL);
+// console.log(SUPABASE_KEY , SUPABASE_URL);
 
 export const supabase = createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: {
